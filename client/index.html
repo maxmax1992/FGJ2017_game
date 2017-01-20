@@ -1,5 +1,5 @@
-<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;">
-</canvas>
+
+<canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
  
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
@@ -10,8 +10,11 @@
        
     socket.on('newPositions',function(data){
         ctx.clearRect(0,0,500,500);
-        for(var i = 0 ; i < data.length; i++)
-            ctx.fillText(data[i].number,data[i].x,data[i].y);      
+        for(var i = 0 ; i < data.player.length; i++)
+            ctx.fillText(data.player[i].number,data.player[i].x,data.player[i].y);     
+           
+        for(var i = 0 ; i < data.bullet.length; i++)
+            ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,10,10);     
     });
  
     document.onkeydown = function(event){
