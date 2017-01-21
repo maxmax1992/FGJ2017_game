@@ -18,8 +18,38 @@ console.log("Server started.");
 
 
 var SOCKET_LIST = {};
+<<<<<<< HEAD
 
 /*
+=======
+var World = function(){
+	var self = this;
+	self.tiles = [];
+	self.oldTiles = [];
+	self.tileSize = 6;
+	self.gridSize = 100;
+	for (var i = 0; i < self.gridSize; i++) {
+	    self.tiles[i] = [];
+	    self.oldTiles[i] = [];
+	    for (var j = 0; j < self.gridSize; j++) {
+	        self.tiles[i][j] = 0.0;
+	        self.oldTiles[i][j] = 0.0;
+	    }
+	}
+	self.update = function(){
+	var newtiles =  []
+	for (var i = 0; i < self.gridSize; i++) {
+	    newtiles[i] = [];
+	    for (var j = 0; j < self.gridSize; j++) {
+	        newtiles[i][j] = (self.oldTiles[i][j-1] + self.oldTiles[i][j+1] + self.oldTiles[i-1][j] + self.oldTiles[i+1][j])/2 - self.oldTiles[i][j]
+		}
+	}
+	self.oldTiles = self.tiles;
+	self.tiles = newtiles;
+	}
+}
+WORLD = new World();
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 var Entity = function(param){
 	var self = {
 		x:250,
@@ -61,7 +91,11 @@ var Player = function(param){
 	self.walking = false;
 	self.shooting = false;
 	self.mouseAngle = 0;
+<<<<<<< HEAD
 	self.maxSpd = 5;
+=======
+	self.maxSpd = 4;
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 	self.hp = 10;
 	self.hpMax = 10;
 	self.score = 0;
@@ -72,6 +106,12 @@ var Player = function(param){
 
 		super_update();
 
+<<<<<<< HEAD
+=======
+		//console.log( Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize) )
+		//console.log( WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)])
+
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 		if(self.pressingAttack){
 			self.shootBullet(self.mouseAngle);
 			self.shooting = true;
@@ -198,9 +238,19 @@ Player.update = function(){
 var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
+<<<<<<< HEAD
 	self.angle = param.angle;
 	self.spdX = Math.cos(param.angle/180*Math.PI) * 8;
 	self.spdY = Math.sin(param.angle/180*Math.PI) * 8;
+=======
+	self.angle = param.angle/180*Math.PI;
+	/*
+	self.spdX = Math.cos(param.angle/180*Math.PI) * 10;
+	self.spdY = Math.sin(param.angle/180*Math.PI) * 10;
+	*/
+	self.spd = 10;
+	self.dis = 0;
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 	self.parent = param.parent;
 
 	self.timer = 0;
@@ -209,7 +259,12 @@ var Bullet = function(param){
 	self.update = function(){
 		if(self.timer++ > 100)
 			self.toRemove = true;
+<<<<<<< HEAD
 		super_update();
+=======
+		//super_update();
+		self.dis += self.spd;
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 
 		for(var i in Player.list){
 			var p = Player.list[i];
@@ -233,13 +288,18 @@ var Bullet = function(param){
 			id:self.id,
 			x:self.x,
 			y:self.y,
+			a:self.angle,
 		};
 	}
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
+<<<<<<< HEAD
 			x:self.x,
 			y:self.y,
+=======
+			dis:self.dis,
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 		};
 	}
 
@@ -328,12 +388,13 @@ io.sockets.on('connection', function(socket){
 
 var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
-
+var wavePack = [];
 
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
+		world:wavePack,
 	}
 
 	for(var i in SOCKET_LIST){
@@ -346,7 +407,12 @@ setInterval(function(){
 	initPack.bullet = [];
 	removePack.player = [];
 	removePack.bullet = [];
+<<<<<<< HEAD
 
+=======
+	wavePack = [];
+	
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 },1000/25);
 
 /*

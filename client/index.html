@@ -69,6 +69,35 @@
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
 
+<<<<<<< HEAD
+=======
+	var World = function(){
+		var self = this;
+		self.tiles = [];
+		self.tileSize = 6;
+		self.gridSize = 100;
+		for (var i = 0; i < self.gridSize; i++) {
+		    self.tiles[i] = [];
+		    for (var j = 0; j < self.gridSize; j++) {
+		        self.tiles[i][j] = 0.0;
+		    }
+		}
+		self.draw = function(){
+		console.log("ASDSD");
+		for (var i = 0; i < self.gridSize; i++) {
+		    for (var j = 0; j < self.gridSize; j++) {
+				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
+				var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
+				ctx.fillStyle = 'rgb(' + i + ','  + j + ',0)';
+				ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
+				}
+			}
+		}
+	}
+	WORLD = new World();
+
+
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 	var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
@@ -135,6 +164,7 @@
 	var Bullet = function(initPack){
 		var self = {};
 		self.id = initPack.id;
+<<<<<<< HEAD
 		self.x = initPack.x;
 		self.y = initPack.y;
 
@@ -145,9 +175,27 @@
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
 
+=======
+		self.sx = initPack.x;
+		self.sy = initPack.y;
+		self.dis = 0;
+		self.angle = initPack.a;
+		self.draw = function(){
+			var width = Img.bullet.width/2;
+			var height = Img.bullet.height/2;
+			
+			var x = self.sx - Player.list[selfId].x + WIDTH/2;
+			var y = self.sy - Player.list[selfId].y + HEIGHT/2;
+			ctx.beginPath();
+			ctx.arc(x, y, self.dis, self.angle- Math.PI/4, self.angle+Math.PI/4);
+			ctx.stroke();
+
+			/*
+>>>>>>> 149106b429c5d56ef0ada67da4922a75e0bc6482
 			ctx.drawImage(Img.bullet,
 				0,0,Img.bullet.width,Img.bullet.height,
 				x-width/2,y-height/2,width,height);
+			*/
 		}
 
 		Bullet.list[self.id] = self;
@@ -193,10 +241,14 @@
 			var pack = data.bullet[i];
 			var b = Bullet.list[data.bullet[i].id];
 			if(b){
+				if(pack.dis !== undefined)
+					b.dis = pack.dis;
+				/*
 				if(pack.x !== undefined)
 					b.x = pack.x;
 				if(pack.y !== undefined)
 					b.y = pack.y;
+				*/
 			}
 		}
 	});
@@ -216,6 +268,7 @@
 			return;
 		ctx.clearRect(0,0,500,500);
 		drawScore();
+		WORLD.draw();
 		for(var i in Player.list)
 			Player.list[i].draw();
 		for(var i in Bullet.list)
