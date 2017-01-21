@@ -125,7 +125,7 @@
 
 
 
-		self.draw = function(){
+		self.draw = function() {
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
 
@@ -163,7 +163,7 @@
 			var angle = 0;
 			if (self.mouseAngle)
 				angle = self.mouseAngle;
-			ctx.translate(canvas.width / 2, canvas.height / 2);
+			ctx.translate(x, y);
 			ctx.rotate(0.0174533 * (self.mouseAngle+90));// + 90)/ Math.PI * 180);
 
 			var img = currentAction();
@@ -175,7 +175,7 @@
 
 			ctx.rotate(-0.0174533 * self.mouseAngle);// + 90)/ Math.PI * 180);
 
-			ctx.translate(-canvas.width / 2, -canvas.height / 2);
+			ctx.translate(-x, -y);
 			ctx.restore();
 			//ctx.fillText(self.score,self.x,self.y-60);
 		}
