@@ -1,5 +1,3 @@
-//var mongojs = require("mongojs");
-var db = null;//mongojs('localhost:27017/myGame', ['account','progress']);
 
 var express = require('express');
 var app = express();
@@ -18,29 +16,48 @@ var World = function(){
 	var self = this;
 	self.tiles = [];
 	self.oldTiles = [];
-	self.tileSize = 6;
+	self.tileSize = 8;
 	self.gridSize = 100;
 	for (var i = 0; i < self.gridSize; i++) {
 	    self.tiles[i] = [];
 	    self.oldTiles[i] = [];
 	    for (var j = 0; j < self.gridSize; j++) {
-	        self.tiles[i][j] = 0.0;
-	        self.oldTiles[i][j] = 0.0;
+	        //self.tiles[i][j] = [0.0,0.0];
+	        //self.oldTiles[i][j] = [0.0,0.0];
+	        self.tiles[i][j] = 0;
+	        self.oldTiles[i][j] = 0;
 	    }
-	}
-	self.update = function(){
-	var newtiles =  []
-	for (var i = 0; i < self.gridSize; i++) {
-	    newtiles[i] = [];
-	    for (var j = 0; j < self.gridSize; j++) {
-	        newtiles[i][j] = (self.oldTiles[i][j-1] + self.oldTiles[i][j+1] + self.oldTiles[i-1][j] + self.oldTiles[i+1][j])/2 - self.oldTiles[i][j]
-		}
-	}
-	self.oldTiles = self.tiles;
-	self.tiles = newtiles;
 	}
 }
 WORLD = new World();
+
+World.update = function(){
+	pack = [];
+	var newtiles =  []
+	//console.log(WORLD.tiles);
+
+	for (var i = 0; i < WORLD.gridSize; i++) {
+	    newtiles[i] = [];
+	    for (var j = 0; j < WORLD.gridSize; j++) {
+	    	var newval = 0
+		    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
+		        newval = Math.floor(Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
+		        //newval = Math.floor(Math.abs( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
+
+	        }
+	        if (newval != WORLD.oldTiles[i][j] ){
+	        	pack.push([i,j,newval])
+	        }
+	        newtiles[i][j] = newval; 
+		}
+	}
+	WORLD.oldTiles = WORLD.tiles;
+	WORLD.tiles = newtiles;
+	//console.log(pack.length);
+
+	return pack;
+	}
+
 var Entity = function(param){
 	var self = {
 		x:250,
@@ -99,12 +116,14 @@ var Player = function(param){
 		}
 	}
 	self.shootBullet = function(angle){
-		Bullet({
+		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 255
+		/*Bullet({
 			parent:self.id,
 			angle:angle,
 			x:self.x,
 			y:self.y,
 		});
+		*/
 	}
 	
 	self.updateSpd = function(){
@@ -333,13 +352,12 @@ io.sockets.on('connection', function(socket){
 
 var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
-var wavePack = [];
 
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
-		world:wavePack,
+		world:World.update(),
 	}
 	
 	for(var i in SOCKET_LIST){
@@ -351,9 +369,7 @@ setInterval(function(){
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];
-	removePack.bullet = [];
-	wavePack = [];
-	
+	removePack.bullet = [];	
 },1000/25);
 
 /*

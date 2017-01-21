@@ -62,7 +62,7 @@
 	var World = function(){
 		var self = this;
 		self.tiles = [];
-		self.tileSize = 6;
+		self.tileSize = 8;
 		self.gridSize = 100;
 		for (var i = 0; i < self.gridSize; i++) {
 		    self.tiles[i] = [];
@@ -71,12 +71,17 @@
 		    }
 		}
 		self.draw = function(){
-		console.log("ASDSD");
 		for (var i = 0; i < self.gridSize; i++) {
 		    for (var j = 0; j < self.gridSize; j++) {
 				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
 				var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
-				ctx.fillStyle = 'rgb(' + i + ','  + j + ',0)';
+				//console.log(self.tiles[i][j])
+				//var c = Math.floor(self.tiles[i][j]*self.tiles[i][j]) / 255*255;
+				//var c = Math.floor( (self.tiles[i][j]*( self.tiles[i][j] / 2)) / (255*126) );
+				//var c = (self.tiles[i][j]*self.tiles[i][j]) / (255*255);
+				var c = self.tiles[i][j]
+				//console.log(c);
+				ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
 				ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
 				}
 			}
@@ -195,6 +200,12 @@
 				*/
 			}
 		}
+		for(var i = 0 ; i < data.world.length; i++){
+			var pack = data.world[i];
+			//console.log(pack);
+			WORLD.tiles[pack[0]][pack[1]] = pack[2];
+		}
+
 	});
 	
 	socket.on('remove',function(data){
