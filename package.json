@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "^4.14.0",
     "save": "^2.3.0",
-    "socket.io": "^1.7.2"
+    "socket.io": "^1.7.2",
+    "v8-profiler": "^5.6.5"
   },
   "devDependencies": {},
   "scripts": {
@@ -15,5 +16,4 @@
   },
   "author": "",
   "license": "ISC"
-
 }
