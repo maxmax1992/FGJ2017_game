@@ -54,9 +54,10 @@
 
 	var Img = {};
 	Img.player = new Image();
-	Img.player.src = '/client/img/player_black_standing.png';
+	Img.player.src = '/client/img/player.png';
 	Img.bullet = new Image();
 	Img.bullet.src = '/client/img/bullet.png';
+<<<<<<< HEAD
 	Img.player_leftStep = new Image();
 	Img.player_leftStep.src = '/client/img/player_black_leftStep.png';
 	Img.player_rightStep = new Image();
@@ -65,6 +66,8 @@
 	Img.player_shooting.src = 'client/img/player_black_shooting.png';
 
 
+=======
+>>>>>>> 0482f65930f10d94a907376809cf5c760999300a
 	var ctx = document.getElementById("ctx").getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
@@ -86,6 +89,7 @@
 		    for (var j = 0; j < self.gridSize; j++) {
 				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
 				var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
+
 				ctx.fillStyle = 'rgb(' + i + ','  + j + ',0)';
 				ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
 				}
