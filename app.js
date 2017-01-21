@@ -58,7 +58,6 @@ var Player = function(param){
 	self.pressingAttack = false;
 	self.walking = false;
 	self.shooting = false;
-	self.mouseAngle = 0;
 	self.maxSpd = 4;
 	self.hp = 10;
 	self.hpMax = 10;
@@ -71,8 +70,8 @@ var Player = function(param){
 		super_update();
 		//console.log( Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize) )
 		//console.log( WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)])
-
 		if(self.pressingAttack){
+
 			self.shootBullet(self.mouseAngle);
 			self.shooting = true;
 		}
@@ -88,6 +87,9 @@ var Player = function(param){
 			y:self.y,
 		});
 	}
+
+	//if (self.mouseAngle)
+
 
 	self.updateSpd = function(){
 		if(self.pressingRight){
@@ -130,6 +132,7 @@ var Player = function(param){
 			score:self.score,
 			walking:self.walking,
 			shooting:self.shooting,
+			mouseAngle:self.mouseAngle
 		};
 	}
 	self.getUpdatePack = function(){
@@ -141,6 +144,7 @@ var Player = function(param){
 			score:self.score,
 			walking:self.walking,
 			shooting:self.shooting,
+			mouseAngle:self.mouseAngle
 		}
 	}
 
@@ -340,6 +344,8 @@ setInterval(function(){
 		bullet:Bullet.update(),
 		world:wavePack,
 	}
+	//console.log(pack);
+
 
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];

@@ -81,7 +81,6 @@
 		    }
 		}
 		self.draw = function(){
-		console.log("ASDSD");
 		for (var i = 0; i < self.gridSize; i++) {
 		    for (var j = 0; j < self.gridSize; j++) {
 				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
@@ -106,8 +105,8 @@
 		self.score = initPack.score;
 		self.walking = initPack.walking;
 		self.shooting = initPack.shooting;
-		var timer = new Date();
-		var lastStep = timer.getTime();
+		self.mouseAngle = initPack.mouseAngle;
+		var stepper = 0
 
 
 
@@ -129,12 +128,13 @@
 				if(self.shooting)
 					return Img.player_shooting;
 				else if(self.walking) {
-					if (lastStep + 500 < timer.getTime()){
-						lastStep = timer.getTime();
+					stepper++;
+					if (stepper > 10){
+						if (stepper > 20)
+							stepper = 0;
 						return Img.player_leftStep;
 					}
 						else {
-							lastStep = timer.getTime();
 							return Img.player_rightStep;
 						}
 					}
@@ -144,10 +144,15 @@
 				}
 
 
-
+			ctx.save();
+			var angle = 0;
+			if (self.mouseAngle)
+				angle = self.mouseAngle;
+			ctx.rotate(self.mouseAngle);// + 90)/ Math.PI * 180);
+			console.log(self.mouseAngle);
 			ctx.drawImage(currentAction(),
 				x-width/2,y-height/2, width, height);
-
+			ctx.restore();
 			//ctx.fillText(self.score,self.x,self.y-60);
 		}
 
@@ -205,6 +210,7 @@
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
+			console.log("player data" + data[i]);
 			if(p){
 				if(pack.x !== undefined)
 					p.x = pack.x;
@@ -218,6 +224,8 @@
 					p.shooting = pack.shooting;
 				if(pack.walking !== undefined)
 					p.walking = pack.walking;
+				if(pack.mouseAngle !== pack.mouseAngle)
+					p.mouseAngle = pack.mouseAngle;
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
@@ -296,6 +304,7 @@
 		socket.emit('keyPress',{inputId:'attack',state:false});
 	}
 	document.onmousemove = function(event){
+
 		var x = -250 + event.clientX - 8;
 		var y = -250 + event.clientY - 8;
 		var angle = Math.atan2(y,x) / Math.PI * 180;
