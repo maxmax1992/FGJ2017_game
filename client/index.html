@@ -51,10 +51,9 @@
 	//game
 	var Img = {};
 	Img.player = new Image();
-	Img.player.src = '/client/img/player_black_standing.png';
+	Img.player.src = '/client/img/player.png';
 	Img.bullet = new Image();
 	Img.bullet.src = '/client/img/bullet.png';
-		
 	var ctx = document.getElementById("ctx").getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
@@ -76,6 +75,7 @@
 		    for (var j = 0; j < self.gridSize; j++) {
 				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
 				var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
+
 				ctx.fillStyle = 'rgb(' + i + ','  + j + ',0)';
 				ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
 				}
