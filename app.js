@@ -45,14 +45,17 @@ World.update = function(){
 	    for (var j = 0; j < WORLD.gridSize; j++) {
 	    	var newval = 0
 		    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-		        newval = Math.floor(Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
+		        //newval = Math.floor( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
+		        //newval = newval = Math.floor( Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
 		        //newval = Math.floor(Math.abs( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
-
+		        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
+		        newval -= Math.sign(newval);
 	        }
 	        if (newval != WORLD.oldTiles[i][j] ){
 	        	pack.push([i,j,newval])
 	        }
-	        newtiles[i][j] = newval;
+
+			newtiles[i][j] = newval;
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
@@ -60,9 +63,11 @@ World.update = function(){
 	//console.log(pack.length);
 
 	return pack;
+
 	}
 
-WORLD = new World();
+//WORLD = new World();
+
 
 
 var Player = function(param){
