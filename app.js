@@ -72,7 +72,6 @@ World.update = function(){
 
 var Player = function(param){
 	var self = Entity(param);
-	self.number = "" + Math.floor(10 * Math.random());
 	self.pressingRight = false;
 	self.pressingLeft = false;
 	self.pressingUp = false;
@@ -150,7 +149,6 @@ var Player = function(param){
 			id:self.id,
 			x:self.x,
 			y:self.y,
-			number:self.number,
 			hp:self.hp,
 			hpMax:self.hpMax,
 			score:self.score,
