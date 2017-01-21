@@ -1,17 +1,17 @@
 var express = require('express');
 var app = express();
 var serv = require('http').Server(app);
- 
+
 app.get('/',function(req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
 app.use('/client',express.static(__dirname + '/client'));
- 
+
 serv.listen(process.env.PORT || 5000);
 console.log("Server started.");
- 
+
 var SOCKET_LIST = {};
- 
+
 var Entity = function(){
     var self = {
         x:250,
@@ -29,24 +29,24 @@ var Entity = function(){
     }
     return self;
 }
- 
+
 var Player = function(id){
     var self = Entity();
     self.id = id;
-    self.number = "" + Math.floor(10 * Math.random());
+    self.socketID = id;
     self.pressingRight = false;
     self.pressingLeft = false;
     self.pressingUp = false;
     self.pressingDown = false;
     self.maxSpd = 10;
-   
+
     var super_update = self.update;
     self.update = function(){
         self.updateSpd();
         super_update();
     }
-   
-   
+
+
     self.updateSpd = function(){
         if(self.pressingRight)
             self.spdX = self.maxSpd;
@@ -54,13 +54,13 @@ var Player = function(id){
             self.spdX = -self.maxSpd;
         else
             self.spdX = 0;
-       
+
         if(self.pressingUp)
             self.spdY = -self.maxSpd;
         else if(self.pressingDown)
             self.spdY = self.maxSpd;
         else
-            self.spdY = 0;     
+            self.spdY = 0;
     }
     Player.list[id] = self;
     return self;
@@ -78,6 +78,7 @@ Player.onConnect = function(socket){
         else if(data.inputId === 'down')
             player.pressingDown = data.state;
     });
+    socket.emit('setUserId', socket.id);
 }
 Player.onDisconnect = function(socket){
     delete Player.list[socket.id];
@@ -90,19 +91,19 @@ Player.update = function(){
         pack.push({
             x:player.x,
             y:player.y,
-            number:player.number
-        });    
+            number:player.socketID
+        });
     }
     return pack;
 }
- 
- 
+
+
 var Bullet = function(angle){
     var self = Entity();
     self.id = Math.random();
     self.spdX = Math.cos(angle/180*Math.PI) * 10;
     self.spdY = Math.sin(angle/180*Math.PI) * 10;
-   
+
     self.timer = 0;
     self.toRemove = false;
     var super_update = self.update;
@@ -115,12 +116,12 @@ var Bullet = function(angle){
     return self;
 }
 Bullet.list = {};
- 
+
 Bullet.update = function(){
     if(Math.random() < 0.1){
         Bullet(Math.random()*360);
     }
-   
+
     var pack = [];
     for(var i in Bullet.list){
         var bullet = Bullet.list[i];
@@ -128,34 +129,34 @@ Bullet.update = function(){
         pack.push({
             x:bullet.x,
             y:bullet.y,
-        });    
+        });
     }
     return pack;
 }
- 
+
 var io = require('socket.io')(serv,{});
 io.sockets.on('connection', function(socket){
     socket.id = Math.random();
     SOCKET_LIST[socket.id] = socket;
-   
+
     Player.onConnect(socket);
-   
+
     socket.on('disconnect',function(){
         delete SOCKET_LIST[socket.id];
         Player.onDisconnect(socket);
     });
-   
-   
-   
-   
+
+
+
+
 });
- 
+
 setInterval(function(){
     var pack = {
         player:Player.update(),
         bullet:Bullet.update(),
     }
-   
+
     for(var i in SOCKET_LIST){
         var socket = SOCKET_LIST[i];
         socket.emit('newPositions',pack);
