@@ -1,6 +1,6 @@
 <div id="gameDiv" style="display:none;">
 	<div id="game" style="position:absolute;width:500px;height:500px">
-		<canvas id="ctx" width="500" height="500" style="position:absolute;border:1px solid #000000;"></canvas>
+		<canvas id="canvas" width="500" height="500" style="position:absolute;border:1px solid #000000;"></canvas>
 		<canvas id="ctx-ui" width="500" height="500" style="position:absolute;border:1px solid #000000;"></canvas>
 	</div>
 
@@ -35,7 +35,7 @@
 		chatText.innerHTML += '<div>' + data + '</div>';
 	});
 	socket.on('evalAnswer',function(data){
-		console.log(data);
+		// console.log(data);
 	});
 
 
@@ -65,7 +65,8 @@
 	Img.player_shooting.src = 'client/img/player_black_shooting.png';
 
 
-	var ctx = document.getElementById("ctx").getContext("2d");
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
 
@@ -148,10 +149,20 @@
 			var angle = 0;
 			if (self.mouseAngle)
 				angle = self.mouseAngle;
-			ctx.rotate(self.mouseAngle);// + 90)/ Math.PI * 180);
-			console.log(self.mouseAngle);
-			ctx.drawImage(currentAction(),
-				x-width/2,y-height/2, width, height);
+			ctx.translate(canvas.width / 2, canvas.height / 2);
+			ctx.rotate(0.0174533 * (self.mouseAngle+90));// + 90)/ Math.PI * 180);
+
+			var img = currentAction();
+			// ctx.drawImage(,
+			// 	x-width/2,y-height/2, width, height);
+			//  console.log("\n3: " + width + "\n4: " +  height);
+			ctx.drawImage(img, -width/2, -width/2, width, height);
+
+
+			ctx.rotate(-0.0174533 * self.mouseAngle);// + 90)/ Math.PI * 180);
+
+			ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
 			ctx.restore();
 			//ctx.fillText(self.score,self.x,self.y-60);
 		}
@@ -210,7 +221,6 @@
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
-			console.log("player data" + data[i]);
 			if(p){
 				if(pack.x !== undefined)
 					p.x = pack.x;
@@ -224,7 +234,7 @@
 					p.shooting = pack.shooting;
 				if(pack.walking !== undefined)
 					p.walking = pack.walking;
-				if(pack.mouseAngle !== pack.mouseAngle)
+				if(pack.mouseAngle !== undefined)
 					p.mouseAngle = pack.mouseAngle;
 			}
 		}
