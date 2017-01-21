@@ -1,22 +1,62 @@
 
 <canvas id="ctx" width="500" height="500" style="border:1px solid #000000;"></canvas>
- 
+
+<div style="display:none;">
+<img id="player_black_leftStep" src="client/pics/player_black_leftStep.png">
+<img id="player_green_stepLeft" src="client/pics/player_green_stepLeft.png">
+<img id="player_green_stepRight" src="client/pics/player_green_stepRight.png">
+<img id="player_red_leftStep" src="client/pics/player_red_leftStep.png">
+<img id="player_red_rightStep" src="client/pics/player_red_rightStep.png">
+<img id="player_yellow_stepLeft" src="client/pics/player_yellow_stepLeft.png">
+<img id="player_yellow_stepRight" src="client/pics/player_yellow_stepRight.png">
+<img id="tile_brick" src="client/pics/tile_brick.png">
+<img id="tile_grass" src="client/pics/tile_grass.png">
+<img id="tile_house_corner" src="client/pics/tile_house_corner.png">
+<img id="tile_house_middle" src="client/pics/tile_house_middle.png">
+<img id="tile_house_side" src=".client/pics/tile_house_side.png">
+</div>
+
 <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 <script>
+
+    var player_black_leftStep = document.getElementById("player_black_leftStep");
+    var player_black_rightStep = document.getElementById("player_black_rightStep");
+    var player_green_stepLeft = document.getElementById("player_green_stepLeft");
+    var player_green_stepRight = document.getElementById("player_green_stepRight");
+    var player_red_leftStep = document.getElementById("player_red_leftStep");
+    var player_red_rightStep = document.getElementById("player_red_rightStep");
+    var player_yellow_stepLeft = document.getElementById("player_yellow_stepLeft");
+    var player_yellow_stepRight = document.getElementById("player_yellow_stepRight");
+    var tile_brick = document.getElementById("tile_brick");
+    var tile_grass = document.getElementById("tile_grass");
+    var tile_house_corner = document.getElementById("tile_house_corner");
+    var tile_house_middle = document.getElementById("tile_house_middle");
+    var tile_house_side = document.getElementById("tile_house_side");
+
+    var Img = {};
+    Img.tile_grass = new Image();
+    Img.tile_grass.src = '/pics/tile_grass.png';
+
     var ctx = document.getElementById("ctx").getContext("2d");
     ctx.font = '30px Arial';
-   
+
     var socket = io();
-       
+
     socket.on('newPositions',function(data){
         ctx.clearRect(0,0,500,500);
+
+        for(var i = 0 ; i < 500 ; i = i + 50){
+         for(var j = 0; j < 500 ; j = j + 50)
+          ctx.drawImage(tile_grass, i, j, 50, 50);
+        }
+
         for(var i = 0 ; i < data.player.length; i++)
-            ctx.fillText(data.player[i].number,data.player[i].x,data.player[i].y);     
-           
+            ctx.drawImage(player_black_leftStep,data.player[i].x-50,data.player[i].y-50, 100, 100);
+
         for(var i = 0 ; i < data.bullet.length; i++)
-            ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,10,10);     
+            ctx.fillRect(data.bullet[i].x-5,data.bullet[i].y-5,10,10);
     });
- 
+
     document.onkeydown = function(event){
         if(event.keyCode === 68)    //d
             socket.emit('keyPress',{inputId:'right',state:true});
@@ -26,7 +66,7 @@
             socket.emit('keyPress',{inputId:'left',state:true});
         else if(event.keyCode === 87) // w
             socket.emit('keyPress',{inputId:'up',state:true});
-           
+
     }
     document.onkeyup = function(event){
         if(event.keyCode === 68)    //d
@@ -38,5 +78,5 @@
         else if(event.keyCode === 87) // w
             socket.emit('keyPress',{inputId:'up',state:false});
     }
-   
+
 </script>
