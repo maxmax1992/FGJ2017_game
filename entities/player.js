@@ -11,6 +11,7 @@ Player = function(id){
     self.pressingUp = false;
     self.pressingDown = false;
     self.maxSpd = 10;
+    self.mouseAngle = 0;
 
     var super_update = self.update;
     self.update = function(){
@@ -25,13 +26,13 @@ Player = function(id){
             self.spdX = -self.maxSpd;
         else
             self.spdX = 0;
-       
+
         if(self.pressingUp)
             self.spdY = -self.maxSpd;
         else if(self.pressingDown)
             self.spdY = self.maxSpd;
         else
-            self.spdY = 0;     
+            self.spdY = 0;
     }
     Player.list[id] = self;
     return self;
@@ -64,7 +65,7 @@ Player.update = function(){
             x:player.x,
             y:player.y,
             number:player.number
-        });    
+        });
     }
     return pack;
 }
