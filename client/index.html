@@ -52,6 +52,32 @@
 
 	//const fs = require('fs');
 
+	var image_names = [
+		"bullet.png",                  "player_red_shooting.png",
+"player.png",                  "player_red_standing.png",
+"player_black_leftStep.png",   "player_yellow_shooting.png",
+"player_black_rightStep.png",  "player_yellow_standing.png",
+"player_black_shooting.png",   "player_yellow_stepLeft.png",
+"player_black_standing.png",   "player_yellow_stepRight.png",
+"player_green_shooting.png",   "tile_brick.png",
+"player_green_standing.png",   "tile_grass.png",
+"player_green_stepLeft.png,   tile_house_corner.png",
+"player_green_stepRight.png",  "tile_house_middle.png",
+"player_red_leftStep.png",     "tile_house_side.png",
+"player_red_rightStep.png"
+	];
+
+
+
+	var Img = {};
+	image_dir = '/client/img/';
+
+	image_names.forEach( function(name) {
+		Img[name] = new Image();
+		Img[name] = image_dir + name;
+	});
+	console.log(Img);
+
 	var Img = {};
 	Img.player = new Image();
 	Img.player.src = '/client/img/player_black_standing.png';
@@ -83,16 +109,19 @@
 		self.draw = function(){
 		for (var i = 0; i < self.gridSize; i++) {
 		    for (var j = 0; j < self.gridSize; j++) {
-				var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
-				var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
-				//console.log(self.tiles[i][j])
-				//var c = Math.floor(self.tiles[i][j]*self.tiles[i][j]) / 255*255;
-				//var c = Math.floor( (self.tiles[i][j]*( self.tiles[i][j] / 2)) / (255*126) );
-				//var c = (self.tiles[i][j]*self.tiles[i][j]) / (255*255);
-				var c = self.tiles[i][j]
-				//console.log(c);
-				ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
-				ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
+					if (i%50 == 0 && j%50 == 0) {
+
+					}
+					var x = i*self.tileSize - Player.list[selfId].x + WIDTH/2;
+					var y = j*self.tileSize - Player.list[selfId].y + HEIGHT/2;
+					//console.log(self.tiles[i][j])
+					//var c = Math.floor(self.tiles[i][j]*self.tiles[i][j]) / 255*255;
+					//var c = Math.floor( (self.tiles[i][j]*( self.tiles[i][j] / 2)) / (255*126) );
+					//var c = (self.tiles[i][j]*self.tiles[i][j]) / (255*255);
+					var c = self.tiles[i][j]
+					//console.log(c);
+					ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
+					ctx.fillRect(x - 3,y - 3,self.tileSize,self.tileSize);
 				}
 			}
 		}
@@ -154,7 +183,6 @@
 			if (self.mouseAngle)
 				angle = self.mouseAngle;
 			ctx.rotate(self.mouseAngle);// + 90)/ Math.PI * 180);
-			console.log(self.mouseAngle);
 			ctx.drawImage(currentAction(),
 				x-width/2,y-height/2, width, height);
 			ctx.restore();
@@ -215,7 +243,6 @@
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
-			console.log("player data" + data[i]);
 			if(p){
 				if(pack.x !== undefined)
 					p.x = pack.x;
@@ -249,7 +276,6 @@
 		}
 		for(var i = 0 ; i < data.world.length; i++){
 			var pack = data.world[i];
-			//console.log(pack);
 			WORLD.tiles[pack[0]][pack[1]] = pack[2];
 		}
 

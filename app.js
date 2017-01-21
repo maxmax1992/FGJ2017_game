@@ -52,7 +52,7 @@ World.update = function(){
 	        if (newval != WORLD.oldTiles[i][j] ){
 	        	pack.push([i,j,newval])
 	        }
-	        newtiles[i][j] = newval; 
+	        newtiles[i][j] = newval;
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
@@ -61,7 +61,7 @@ World.update = function(){
 
 	return pack;
 	}
-}
+
 WORLD = new World();
 
 
@@ -374,7 +374,7 @@ setInterval(function(){
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];
-	removePack.bullet = [];	
+	removePack.bullet = [];
 },1000/25);
 
 /*
