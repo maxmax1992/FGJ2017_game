@@ -157,26 +157,10 @@
 				else{
 					ctx.fillStyle = 'rgb('+Math.abs(c)+',0,'  + Math.abs(c) +')';
 				}
-			}
-
-		for (var i = 0; i < self.gridSize; i++) {
-		    for (var j = 0; j < self.gridSize; j++) {
-					var x = i*self.tileSize + bx;
-					var y = j*self.tileSize + by;
-					//console.log(self.tiles[i][j])
-					//var c = Math.floor(self.tiles[i][j]*self.tiles[i][j]) / 255*255;
-					//var c = Math.floor( (self.tiles[i][j]*( self.tiles[i][j] / 2)) / (255*126) );
-					//var c = (self.tiles[i][j]*self.tiles[i][j]) / (255*255);
-					var c = self.tiles[i][j];
-					if (c > 0){
-						ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
-					}
-					else{
-						ctx.fillStyle = 'rgb(0, 0,'  + (c) +')';
-					}
-					if (Math.abs(c) > 10)
+				if (Math.abs(c) > 10)
 						ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 				}
+
 			}
 		WORLD.oldTiles = WORLD.tiles;
 		WORLD.tiles = newtiles;
