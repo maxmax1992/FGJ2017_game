@@ -13,7 +13,7 @@
 
 	<div id="belowGame" style="margin-top:620px">
 		<div id="chat-text" style="width:800;height:100px;overflow-y:scroll">
-			<div>Hello!</div>
+			<div>Hello! Please set your display name with the /name command.</div>
 		</div>
 
 		<form id="chat-form">
@@ -41,7 +41,7 @@
 		chatText.innerHTML = '<div>' + data + '</div>' + chatText.innerHTML;
 	});
 	socket.on('evalAnswer',function(data){
-		// console.log(data);
+		console.log(data);
 	});
 
 
@@ -100,14 +100,15 @@
 	var bgr = document.getElementById("backgr").getContext("2d");
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
-	
+
 	var gfx0 = document.getElementById("effect0").getContext("2d");
 	var gfx1 = document.getElementById("effect1").getContext("2d");
 	var gfx2 = document.getElementById("effect2").getContext("2d");
 
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
-	gfx0.globalAlpha = 0.8;
+
+	gfx0.globalAlpha = 0.85;
 	gfx1.globalAlpha = 0.6;
 	gfx2.globalAlpha = 0.4;
 
@@ -148,7 +149,7 @@
 		}
 		self.draw = function(){
 		var bx = - Player.list[selfId].x + WIDTH/2;
-		var by = - Player.list[selfId].y + HEIGHT/2; 
+		var by = - Player.list[selfId].y + HEIGHT/2;
 		var newtiles =  []
 
 		for (var i = 0; i < self.gridSize; i++) {
@@ -161,28 +162,29 @@
 		    	if (self.solidTiles[i][j]){
 					ctx.fillStyle = 'black';
 					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
-		    	}  
+		    	}
 			    else if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-			        newval =  Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + 
+			        newval =  0.90*Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
 			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
-			        newval -= Math.sign(newval); 
+			        newval -= Math.sign(newval);
 		        }
-				newtiles[i][j] = newval; 
-		    	
+				newtiles[i][j] = newval;
+
 				var c = Math.min(255,self.tiles[i][j]);
 				if (c > 0){
 					var r = Math.ceil((c/255)*155)+100;
 					var b = Math.ceil((c/255)*100)
 					if (c > 128){
-						gfx0.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+						gfx0.fillStyle = 'rgb(' + c + ','  + 0 + ',0)';
 						gfx0.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else if (c > 64){
-						gfx1.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+						gfx1.fillStyle = 'rgb(' + 0 + ','  + c + ',0)';
 						gfx1.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else{
-						gfx2.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+
+						gfx2.fillStyle = 'rgb(' + 0 + ','  + 0 + ',0)';
 						gfx2.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 				}
@@ -219,6 +221,7 @@
 	var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
+		self.name = initPack.id;
 		self.x = initPack.x;
 		self.y = initPack.y;
 		self.hp = initPack.hp;
@@ -307,11 +310,11 @@
 		self.sx = initPack.x;
 		self.sy = initPack.y;
 		self.angle = initPack.a;
-		var Img_bullet = Img["bullet.png"];
+		var Img_bullet = Img["wave_normal.png"];
 
 		self.draw = function(){
-			var width = Img_bullet.width/2;
-			var height = Img_bullet.height/2;
+			var width = 40;
+			var height = 10;
 
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
@@ -320,8 +323,8 @@
 			ctx.stroke();
 			*/
 			ctx.drawImage(Img_bullet,
-				0,0,Img_bullet.width,Img_bullet.height,
-				x-width/2,y-height/2,width,height);
+				0,0,Img_bullet.width,height,
+				x-width/2,y-height/2,width,height)
 		}
 
 		Bullet.list[self.id] = self;
@@ -364,7 +367,7 @@
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
-			
+
 			var pack = data.bullet[i];
 			var b = Bullet.list[pack.id];
 			if(b){

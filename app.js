@@ -40,21 +40,21 @@ var World = function(){
 	        self.oldTiles[i][j] = 0;
     	    self.solidTiles[i][j] = false;
     	    //if( i == 50 && j == 46){
-    	   	
+
     	    if( i == 50 && j >= 30 &&j <= 60 && j!=42 && j!=43 && j!=44 && j!=46 && j!=47 && j!=48){
-	    	    self.solidTiles[i][j] = true; 
+	    	    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
     	    }
     	    else if( i == 20 && j >= 30 &&j <= 60 ){
-	    	    self.solidTiles[i][j] = true; 
+	    	    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
     	    }
     	    else if( j == 30 && i > 20 &&i < 50 ){
-			    self.solidTiles[i][j] = true; 
+			    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
     	    }
     	    else if( j == 60 && i > 20 &&i < 50 ){
-			    self.solidTiles[i][j] = true; 
+			    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
     	    }
 
@@ -83,7 +83,7 @@ World.update = function(){
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
-	WORLD.tiles = newtiles;	
+	WORLD.tiles = newtiles;
 }
 
 
@@ -213,6 +213,7 @@ var Player = function(param){
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
+			name:self.name,
 			x:self.x,
 			y:self.y,
 			hp:self.hp,
@@ -291,7 +292,7 @@ var Bullet = function(param){
 	var trailStrenght = 64;
 
 	self.update = function(){
-		if(self.timer++ > 100)
+		if(self.timer++ > 40)
 			self.toRemove = true;
 		super_update();
 		//trail
@@ -304,8 +305,11 @@ var Bullet = function(param){
 				p.hp -= 1;
 				if(p.hp <= 0){
 					var shooter = Player.list[self.parent];
-					if(shooter)
+					if(shooter){
 						shooter.score += 1;
+						for(var i in SOCKET_LIST)
+							SOCKET_LIST[i].emit('addToChat', shooter.name + " killed " + p.name + "! Score: " + shooter.score);
+					}
 					p.hp = p.hpMax;
 					p.x = Math.random() * 500;
 					p.y = Math.random() * 500;
@@ -358,17 +362,9 @@ Bullet.getAllInitPack = function(){
 	return bullets;
 }
 
-var DEBUG = true;
+var DEBUG = false;
+var names = [];
 
-var isValidPassword = function(data,cb){
-	return cb(true);
-	/*db.account.find({username:data.username,password:data.password},function(err,res){
-		if(res.length > 0)
-			cb(true);
-		else
-			cb(false);
-	});*/
-}
 var isUsernameTaken = function(data,cb){
 	return cb(false);
 	/*db.account.find({username:data.username},function(err,res){
@@ -397,17 +393,43 @@ io.sockets.on('connection', function(socket){
 		Player.onDisconnect(socket);
 	});
 	socket.on('sendMsgToServer',function(data){
-		var playerName = ("" + socket.id).slice(2,7);
+		var playerName = "";
+		if(Player.list[socket.id].name == "")
+			var playerName = ("" + socket.id).slice(2,7);
+		else
+			var playerName = Player.list[socket.id].name;
 		for(var i in SOCKET_LIST){
 			SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
 		}
 	});
 
 	socket.on('evalServer',function(data){
-		if(!DEBUG)
+		if(DEBUG){
+			console.log(data);
+			var res = eval(data);
+			socket.emit('evalAnswer',res);
 			return;
-		var res = eval(data);
-		socket.emit('evalAnswer',res);
+		}
+		if(data.split(" ")[0] == "name"){
+			var name = data.split(" ").slice(1).join(' ');
+			if(names.find(function (list_name){return list_name === name}))
+				socket.emit('addToChat', "Username " + name + " is taken, please choose a new username.");
+			else {
+				names.push(name);
+				console.log(names);
+				console.log(Player.list[socket.id].name);
+				Player.list[socket.id].name = name;
+				console.log(Player.list[socket.id].name);
+				for(var i in SOCKET_LIST)
+					SOCKET_LIST[i].emit('addToChat', name + " joined the chat.");
+
+			}
+		}
+
+
+
+
+
 	});
 });
 
