@@ -190,6 +190,7 @@ var Player = function(param){
 	self.getInitPack = function(){
 		return {
 			id:self.id,
+			name:self.name,
 			x:self.x,
 			y:self.y,
 			hp:self.hp,
@@ -211,6 +212,7 @@ var Player = function(param){
 			walking:self.walking,
 			shooting:self.shooting,
 			mouseAngle:self.mouseAngle
+
 		}
 	}
 
@@ -291,6 +293,7 @@ var Bullet = function(param){
 						shooter.score += 1;
 						for(var i in SOCKET_LIST)
 							SOCKET_LIST[i].emit('addToChat', shooter.name + " killed " + p.name + "! Score: " + shooter.score);
+
 					}
 					p.hp = p.hpMax;
 					p.x = Math.random() * 500;
@@ -398,10 +401,7 @@ io.sockets.on('connection', function(socket){
 				socket.emit('addToChat', "Username " + name + " is taken, please choose a new username.");
 			else {
 				names.push(name);
-				console.log(names);
-				console.log(Player.list[socket.id].name);
 				Player.list[socket.id].name = name;
-				console.log(Player.list[socket.id].name);
 				for(var i in SOCKET_LIST)
 					SOCKET_LIST[i].emit('addToChat', name + " joined the chat.");
 
