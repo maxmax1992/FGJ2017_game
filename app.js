@@ -58,7 +58,6 @@ var World = function(){
     			worldpack.wall.push( [i,j,true] );
     	    }
 
-
 	    }
 	}
 }
