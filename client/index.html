@@ -11,6 +11,10 @@
 		<canvas id="ctx-ui" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
 	</div>
 
+	<div id="scoreboard" style="position:absolute;left:820px;width:200px;height:300px">
+		Scoreboard:
+	</div>
+
 	<div id="belowGame" style="margin-top:620px">
 		<div id="chat-text" style="width:800;height:100px;overflow-y:scroll">
 			<div>Hello! Please set your display name with the /name command.</div>
@@ -36,6 +40,13 @@
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
 	var chatForm = document.getElementById('chat-form');
+	var leaderboard = document.getElementById('scoreboard');//.getElementById('leaderboard');
+
+
+
+	socket.on('updateScoreboard', function(data){
+
+	});
 
 	socket.on('addToChat',function(data){
 		chatText.innerHTML = '<div>' + data + '</div>' + chatText.innerHTML;
@@ -78,6 +89,8 @@
 		"girl_shooting.png",   "girl_step_right.png",  "man_step_left.png",   "wave_normal.png",
 		"girl_standing.png",   "man_shooting.png",     "man_step_right.png",
 		"girl_step_left.png",  "man_standing.png",    "wave_gradient.png",
+		"grass2.png", "grass3.png", "grass4.png", "grass5.png", "grass1.png"
+
 
 	];
 
@@ -129,7 +142,8 @@
 								bgr.drawImage(Img["tile_house_middle.png"], gx , gy, 80, 80);
 						}
 						else{
-							bgr.drawImage(Img["tile_grass.png"], gx , gy, 80, 80);
+							var grass = "grass" +  /*(Math.floor(Math.random() * (5 - 1)) + 1)*/ 1 + ".png";
+							bgr.drawImage(Img[grass], gx , gy, 80, 80);
 						}
 					}
 				}
@@ -316,7 +330,7 @@
 		self.draw = function(){
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
-			
+
 			var width = 40;
 			var height = 10;
 
@@ -348,6 +362,7 @@
 
 		socket.on('update',function(data){
 		//{ player : [{id:123,x:0,y:0},{id:1,x:0,y:0}], bullet: []}
+		var leaders = [];
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
@@ -366,8 +381,26 @@
 					p.walking = pack.walking;
 				if(pack.mouseAngle !== undefined)
 					p.mouseAngle = pack.mouseAngle;
+				if(pack.name !== undefined)
+					p.name = pack.name;
 			}
+
+			leaders.push([p.name, p.score]);
 		}
+		function compareScores(a,b) {
+				return a - b;
+			};
+		leaders.sort(function(a,b) {compareScores(a[1],b[1])});
+
+
+		leaderboard.innerHTML = "Scoreboard:" +
+		"<ol id=\"leaders\" type=\"1\">" +
+		leaders.map(function(leader) {
+			return "<li>" + leader[0] + " " + leader[1] + "</li>";
+		}).reverse().join(" ") +
+		"</ol>"
+
+
 		for(var i = 0 ; i < data.bullet.length; i++){
 
 			var pack = data.bullet[i];
