@@ -107,9 +107,9 @@
 
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
-	gfx0.globalAlpha = 0.85;
-	gfx1.globalAlpha = 0.60;
-	gfx2.globalAlpha = 1;
+	gfx0.globalAlpha = 0.8;
+	gfx1.globalAlpha = 0.6;
+	gfx2.globalAlpha = 0.4;
 
 	var Background = function(){
 		var self = this;
@@ -438,7 +438,8 @@
 			socket.emit('keyPress',{inputId:'left',state:true});
 		else if(event.keyCode === 87) // w
 			socket.emit('keyPress',{inputId:'up',state:true});
-
+		else if(event.keyCode === 81) // q
+			socket.emit('keyPress',{inputId:'q',state:true});
 	}
 	document.onkeyup = function(event){
 		if(event.keyCode === 68)	//d
@@ -449,6 +450,9 @@
 			socket.emit('keyPress',{inputId:'left',state:false});
 		else if(event.keyCode === 87) // w
 			socket.emit('keyPress',{inputId:'up',state:false});
+		else if(event.keyCode === 81) // q
+			socket.emit('keyPress',{inputId:'q',state:false});
+
 	}
 
 	document.onmousedown = function(event){
