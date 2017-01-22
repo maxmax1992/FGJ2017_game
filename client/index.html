@@ -89,6 +89,8 @@
 		"girl_shooting.png",   "girl_step_right.png",  "man_step_left.png",   "wave_normal.png",
 		"girl_standing.png",   "man_shooting.png",     "man_step_right.png",
 		"girl_step_left.png",  "man_standing.png",    "wave_gradient.png",
+		"grass2.png", "grass3.png", "grass4.png", "grass5.png", "grass1.png"
+
 
 	];
 
@@ -140,7 +142,8 @@
 								bgr.drawImage(Img["tile_house_middle.png"], gx , gy, 80, 80);
 						}
 						else{
-							bgr.drawImage(Img["tile_grass.png"], gx , gy, 80, 80);
+							var grass = "grass" +  /*(Math.floor(Math.random() * (5 - 1)) + 1)*/ 1 + ".png";
+							bgr.drawImage(Img[grass], gx , gy, 80, 80);
 						}
 					}
 				}
@@ -327,7 +330,7 @@
 		self.draw = function(){
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
-			
+
 			var width = 40;
 			var height = 10;
 
