@@ -29,7 +29,7 @@
 	gameDiv.style.display = 'inline-block';
 
 	var WIDTH = 800;
-	var HEIGHT = 600;
+	var HEIGHT = 800;
 	var socket = io();
 
 	//chat
@@ -38,7 +38,7 @@
 	var chatForm = document.getElementById('chat-form');
 
 	socket.on('addToChat',function(data){
-		chatText.innerHTML += '<div>' + data + '</div>';
+		chatText.innerHTML = '<div>' + data + '</div>' + chatText.innerHTML;
 	});
 	socket.on('evalAnswer',function(data){
 		console.log(data);
@@ -107,18 +107,19 @@
 
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
+
 	gfx0.globalAlpha = 0.85;
-	gfx1.globalAlpha = 0.60;
-	gfx2.globalAlpha = 0.8;
+	gfx1.globalAlpha = 0.6;
+	gfx2.globalAlpha = 0.4;
 
 	var Background = function(){
 		var self = this;
 		self.draw = function(){
 			var bx = - Player.list[selfId].x + WIDTH/2;
 			var by = - Player.list[selfId].y + HEIGHT/2;
-			for (var i = 0; i < WIDTH; i+=50) {
-					for (var j = 0; j < HEIGHT; j+=50) {
-						bgr.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
+			for (var i = 0; i < WIDTH; i+=80) {
+					for (var j = 0; j < HEIGHT; j+=80) {
+						bgr.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 80, 80);
 					}
 				}
 			}
@@ -440,7 +441,8 @@
 			socket.emit('keyPress',{inputId:'left',state:true});
 		else if(event.keyCode === 87) // w
 			socket.emit('keyPress',{inputId:'up',state:true});
-
+		else if(event.keyCode === 81) // q
+			socket.emit('keyPress',{inputId:'q',state:true});
 	}
 	document.onkeyup = function(event){
 		if(event.keyCode === 68)	//d
@@ -451,6 +453,9 @@
 			socket.emit('keyPress',{inputId:'left',state:false});
 		else if(event.keyCode === 87) // w
 			socket.emit('keyPress',{inputId:'up',state:false});
+		else if(event.keyCode === 81) // q
+			socket.emit('keyPress',{inputId:'q',state:false});
+
 	}
 
 	document.onmousedown = function(event){
