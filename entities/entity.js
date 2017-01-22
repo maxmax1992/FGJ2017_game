@@ -21,8 +21,12 @@ exports.Entity = function(param){
 		self.updatePosition();
 	}
 	self.updatePosition = function(){
+	console.log(self.x,self.y,self.spdX,self.spdY);
+	console.log(Math.floor((self.x + self.spdX)/WORLD.tileSize),Math.floor((self.y + self.spdY)/WORLD.tileSize))
+	if (!WORLD.solidTiles[Math.floor((self.x + self.spdX)/WORLD.tileSize)][Math.floor((self.y + self.spdY)/WORLD.tileSize)]){
 		self.x += self.spdX;
 		self.y += self.spdY;
+		}
 	}
 	self.getDistance = function(pt){
 		return Math.sqrt(Math.pow(self.x-pt.x,2) + Math.pow(self.y-pt.y,2));

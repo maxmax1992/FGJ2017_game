@@ -102,34 +102,37 @@
 		var self = this;
 
 		self.draw = function(){
+			var bx = - Player.list[selfId].x + WIDTH/2;
+			var by = - Player.list[selfId].y + HEIGHT/2;
 			for (var i = 0; i < WIDTH; i++) {
 					for (var j = 0; j < HEIGHT; j++) {
 						if (i%50 == 0 && j%50 == 0) {
-							var bx = - Player.list[selfId].x + WIDTH/2;
-							var by = - Player.list[selfId].y + HEIGHT/2;
 							ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
 						}
+					}
 				}
 			}
 		}
-	}
 	BACKGROUND = new Background();
 
 
 	var World = function(){
 		var self = this;
-		self.tiles = [];
-		self.oldTiles = [];
-		self.tileSize = 8;
-		self.gridSize = 100;
-		for (var i = 0; i < self.gridSize; i++) {
-		    self.tiles[i] = [];
-		    self.oldTiles[i] = [];
-
-		    for (var j = 0; j < self.gridSize; j++) {
-		        self.tiles[i][j] = 0.0;
-    		    self.oldTiles[i][j] = 0.0;
-
+	self.tiles = [];
+	self.oldTiles = [];
+	self.solidTiles = [];
+	self.tileSize = 8;
+	self.gridSize = 100;
+	for (var i = 0; i < self.gridSize; i++) {
+	    self.tiles[i] = [];
+	    self.oldTiles[i] = [];
+	    self.solidTiles[i] = [];
+	    for (var j = 0; j < self.gridSize; j++) {
+	        //self.tiles[i][j] = [0.0,0.0];
+	        //self.oldTiles[i][j] = [0.0,0.0];
+	        self.tiles[i][j] = 0;
+	        self.oldTiles[i][j] = 0;
+    	    self.solidTiles[i][j] = false;
 		    }
 		}
 		self.draw = function(){
@@ -139,28 +142,35 @@
 
 		for (var i = 0; i < self.gridSize; i++) {
 		    newtiles[i] = [];
-		    for (var j = 0; j < self.gridSize; j++) {		    	
+		    for (var j = 0; j < self.gridSize; j++) {
 		    	var newval = 0
-			    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-			        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + 
-			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
+				var x = i*self.tileSize + bx;
+				var y = j*self.tileSize + by;
+
+		    	if (self.solidTiles[i][j]){
+					ctx.fillStyle = 'black';
+					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+		    	}  
+			    else if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
+			        newval =  Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + 
+			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
 			        newval -= Math.sign(newval); 
 		        }
 				newtiles[i][j] = newval; 
 		    	
-				var x = i*self.tileSize + bx;
-				var y = j*self.tileSize + by;
 				var c = self.tiles[i][j];
 				if (c > 0){
 					ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
+					//ctx.fillStyle = 'rgb(' + 255 + ','  + 255 + ',0,0.5)';
 				}
 				else{
 					ctx.fillStyle = 'rgb('+Math.abs(c)+',0,'  + Math.abs(c) +')';
+					//ctx.fillStyle = 'rgb(255,255,255,0.5)';
 				}
-				if (Math.abs(c) > 10)
+				if (Math.abs(c) != 0)
 						ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+				//}
 				}
-
 			}
 		WORLD.oldTiles = WORLD.tiles;
 		WORLD.tiles = newtiles;
@@ -189,7 +199,6 @@
 		var Img_player_leftStep = Img[gender + "_step_left.png"];
 		var Img_player_rightStep = Img[gender + "_step_right.png"];
 		var Img_player_shooting = Img[gender + "_shooting.png"];
-console.log(Img_player);
 
 		self.draw = function() {
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
@@ -330,9 +339,13 @@ console.log(Img_player);
 				*/
 			}
 		}
-		for(var i = 0 ; i < data.wave.tiles.length; i++){
-			WORLD.tiles[data.wave.tiles[i][0]][data.wave.tiles[i][1]] = data.wave.tiles[i][2];
+		for(var i = 0 ; i < data.world.flame.length; i++){
+			WORLD.tiles[data.world.flame[i][0]][data.world.flame[i][1]] = data.world.flame[i][2];
 		}
+		for(var i = 0 ; i < data.world.wall.length; i++){
+			WORLD.solidTiles[data.world.wall[i][0]][data.world.wall[i][1]] = data.world.wall[i][2];
+		}
+
 
 		/*for(var i = 0 ; i < data.world.length; i++){
 			var pack = data.world[i];
