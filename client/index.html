@@ -164,7 +164,7 @@
 					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 		    	}
 			    else if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-			        newval =  0.90*Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
+			        newval =  Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
 			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
 			        newval -= Math.sign(newval);
 		        }
@@ -175,16 +175,16 @@
 					var r = Math.ceil((c/255)*155)+100;
 					var b = Math.ceil((c/255)*100)
 					if (c > 128){
-						gfx0.fillStyle = 'rgb(' + c + ','  + 0 + ',0)';
+						gfx0.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx0.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else if (c > 64){
-						gfx1.fillStyle = 'rgb(' + 0 + ','  + c + ',0)';
+						gfx1.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx1.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else{
 
-						gfx2.fillStyle = 'rgb(' + 0 + ','  + 0 + ',0)';
+						gfx2.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx2.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 				}
