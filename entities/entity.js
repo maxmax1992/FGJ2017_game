@@ -7,6 +7,7 @@ exports.Entity = function(param){
 		spdX:0,
 		spdY:0,
 		id:"",
+		name: ""
 	}
 	if(param){
 		if(param.x)
