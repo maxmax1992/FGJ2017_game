@@ -26,7 +26,6 @@
 	var HEIGHT = 600;
 	var socket = io();
 
-
 	//chat
 	var chatText = document.getElementById('chat-text');
 	var chatInput = document.getElementById('chat-input');
@@ -97,70 +96,79 @@
 	var ctx = canvas.getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
+	ctxUi.globalAlpha = 0.5;
 
 	var Background = function(){
 		var self = this;
 
 		self.draw = function(){
-			for (var i = 0; i < WIDTH; i++) {
-					for (var j = 0; j < HEIGHT; j++) {
-						if (i%50 == 0 && j%50 == 0) {
-							var bx = - Player.list[selfId].x + WIDTH/2;
-							var by = - Player.list[selfId].y + HEIGHT/2;
-							ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
-						}
+			var bx = - Player.list[selfId].x + WIDTH/2;
+			var by = - Player.list[selfId].y + HEIGHT/2;
+			for (var i = 0; i < WIDTH; i+=50) {
+					for (var j = 0; j < HEIGHT; j+=50) {
+						ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
+					}
 				}
 			}
 		}
-	}
 	BACKGROUND = new Background();
 
 
 	var World = function(){
 		var self = this;
-		self.tiles = [];
-		self.oldTiles = [];
-		self.tileSize = 8;
-		self.gridSize = 100;
-		for (var i = 0; i < self.gridSize; i++) {
-		    self.tiles[i] = [];
-		    self.oldTiles[i] = [];
-
-		    for (var j = 0; j < self.gridSize; j++) {
-		        self.tiles[i][j] = 0.0;
-    		    self.oldTiles[i][j] = 0.0;
-
+	self.tiles = [];
+	self.oldTiles = [];
+	self.solidTiles = [];
+	self.tileSize = 8;
+	self.gridSize = 100;
+	for (var i = 0; i < self.gridSize; i++) {
+	    self.tiles[i] = [];
+	    self.oldTiles[i] = [];
+	    self.solidTiles[i] = [];
+	    for (var j = 0; j < self.gridSize; j++) {
+	        //self.tiles[i][j] = [0.0,0.0];
+	        //self.oldTiles[i][j] = [0.0,0.0];
+	        self.tiles[i][j] = 0;
+	        self.oldTiles[i][j] = 0;
+    	    self.solidTiles[i][j] = false;
 		    }
 		}
 		self.draw = function(){
 		var bx = - Player.list[selfId].x + WIDTH/2;
-		var by = - Player.list[selfId].y + HEIGHT/2;
+		var by = - Player.list[selfId].y + HEIGHT/2; 
 		var newtiles =  []
 
 		for (var i = 0; i < self.gridSize; i++) {
 		    newtiles[i] = [];
 		    for (var j = 0; j < self.gridSize; j++) {
 		    	var newval = 0
-			    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-			        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
-			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
-			        newval -= Math.sign(newval);
-		        }
-				newtiles[i][j] = newval;
-
 				var x = i*self.tileSize + bx;
 				var y = j*self.tileSize + by;
+
+		    	if (self.solidTiles[i][j]){
+					ctx.fillStyle = 'black';
+					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+		    	}  
+			    else if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
+			        newval =  Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + 
+			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
+			        newval -= Math.sign(newval); 
+		        }
+				newtiles[i][j] = newval; 
+		    	
 				var c = self.tiles[i][j];
 				if (c > 0){
 					ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
+					//ctxUi.fillStyle = 'rgb(' + 255 + ','  + 255 + ',0,0.5)';
 				}
 				else{
 					ctx.fillStyle = 'rgb('+Math.abs(c)+',0,'  + Math.abs(c) +')';
+					//ctx.fillStyle = 'rgb(255,255,255,0.5)';
 				}
-				if (Math.abs(c) > 10)
-						ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+				if (Math.abs(c) != 0)
+					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+				//}
 				}
-
 			}
 		WORLD.oldTiles = WORLD.tiles;
 		WORLD.tiles = newtiles;
@@ -259,16 +267,21 @@
 		self.sx = initPack.x;
 		self.sy = initPack.y;
 		self.angle = initPack.a;
+		var Img_bullet = Img["bullet.png"];
+
 		self.draw = function(){
-			var width = Img["bullet.png"].width/2;
-			var height = Img["bullet.png"].height/2;
+			var width = Img_bullet.width/2;
+			var height = Img_bullet.height/2;
 
-			var x = self.sx - Player.list[selfId].x + WIDTH/2;
-			var y = self.sy - Player.list[selfId].y + HEIGHT/2;
-
-			ctx.drawImage(Img["bullet.png"],
+			var x = self.x - Player.list[selfId].x + WIDTH/2;
+			var y = self.y - Player.list[selfId].y + HEIGHT/2;
+			/*ctx.beginPath();
+			ctx.arc(x, y, self.dis, self.angle- Math.PI/4, self.angle+Math.PI/4);
+			ctx.stroke();
+			*/
+			ctx.drawImage(Img_bullet,
+				0,0,Img_bullet.width,Img_bullet.height,
 				x-width/2,y-height/2,width,height);
-
 		}
 
 		Bullet.list[self.id] = self;
@@ -276,38 +289,12 @@
 	}
 	Bullet.list = {};
 
-	var Wave = function(initPack){
-		var self = {};
-		self.id = initPack.id;
-		self.sx = initPack.x;
-		self.sy = initPack.y;
-		self.dis = 0;
-		self.angle = initPack.a;
-		self.draw = function(){
-
-			var x = self.sx - Player.list[selfId].x + WIDTH/2;
-			var y = self.sy - Player.list[selfId].y + HEIGHT/2;
-			ctx.beginPath();
-			ctx.arc(x, y, self.dis, self.angle- Math.PI/4, self.angle+Math.PI/4);
-			ctx.stroke();
-
-		}
-
-		Wave.list[self.id] = self;
-		return self;
-	}
-	Wave.list = {};
-
 	var selfId = null;
-
 	socket.on('init',function(data){
 		if(data.selfId)
 			selfId = data.selfId;
 		for(var i = 0 ; i < data.player.length; i++){
 			new Player(data.player[i]);
-		}
-		for(var i = 0 ; i < data.wave.length; i++){
-			new Wave(data.wave[i]);
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
 			new Bullet(data.bullet[i]);
@@ -337,35 +324,23 @@
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
+			
 			var pack = data.bullet[i];
-			var b = Bullet.list[data.bullet[i].id];
-			console.log(b);
+			var b = Bullet.list[pack.id];
 			if(b){
-				console.log(1);
-				if(pack.x !== undefined){
-					b.x = pack.x;
-				console.log(2);}
-				if(pack.y !== undefined)
-					b.y = pack.y;
-				}
-		}
-		for(var i = 0 ; i < data.wave.length; i++){
-			var pack = data.wave[i];
-			var b = Wave.list[data.wave[i].id];
-			if(b){
-				if(pack.dis !== undefined)
-					b.dis = pack.dis;
-				/*
 				if(pack.x !== undefined)
 					b.x = pack.x;
 				if(pack.y !== undefined)
-					b.y = pack.y;*/
-
+					b.y = pack.y;
 			}
 		}
-		for(var i = 0 ; i < data.wave.tiles.length; i++){
-			WORLD.tiles[data.wave.tiles[i][0]][data.wave.tiles[i][1]] = data.wave.tiles[i][2];
+		for(var i = 0 ; i < data.world.flame.length; i++){
+			WORLD.tiles[data.world.flame[i][0]][data.world.flame[i][1]] = data.world.flame[i][2];
 		}
+		for(var i = 0 ; i < data.world.wall.length; i++){
+			WORLD.solidTiles[data.world.wall[i][0]][data.world.wall[i][1]] = data.world.wall[i][2];
+		}
+
 
 		/*for(var i = 0 ; i < data.world.length; i++){
 			var pack = data.world[i];
@@ -379,9 +354,6 @@
 		for(var i = 0 ; i < data.player.length; i++){
 			delete Player.list[data.player[i]];
 		}
-		for(var i = 0 ; i < data.wave.length; i++){
-			delete Wave.list[data.wave[i]];
-		}
 		for(var i = 0 ; i < data.bullet.length; i++){
 			delete Bullet.list[data.bullet[i]];
 		}
@@ -391,13 +363,12 @@
 		if(!selfId)
 			return;
 		ctx.clearRect(0,0,WIDTH,HEIGHT);
+		//ctxUi.clearRect(0,0,WIDTH,HEIGHT);
 		//drawScore();
 		BACKGROUND.draw();
 		WORLD.draw();
 		for(var i in Player.list)
 			Player.list[i].draw();
-		for(var i in Wave.list)
-			Wave.list[i].draw();
 		for(var i in Bullet.list)
 			Bullet.list[i].draw();
 	},40);
