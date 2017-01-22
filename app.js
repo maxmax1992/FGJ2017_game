@@ -55,7 +55,7 @@ World.update = function(){
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
-	WORLD.tiles = newtiles;	
+	WORLD.tiles = newtiles;
 }
 
 
@@ -83,25 +83,28 @@ var Player = function(param){
 		if(self.pressingAttack){
 
 			self.shootBullet(self.mouseAngle);
+			self.shootWave(self.mouseAngle);
 			self.shooting = true;
 		}
 		else {
 			self.shooting = false;
 		}
 	}
-	self.shootBullet = function(angle){
+	self.shootWave = function(angle){
 		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 255
 		wavepack.tiles.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
-		/*Bullet({
+
+	}
+
+	self.shootBullet = function(angle){
+		Bullet({
 			parent:self.id,
 			angle:angle,
 			x:self.x,
 			y:self.y,
 		});
-		*/
-	}
 
-	//if (self.mouseAngle)
+	}
 
 
 	self.updateSpd = function(){
@@ -186,7 +189,8 @@ Player.onConnect = function(socket){
 	socket.emit('init',{
 		selfId:socket.id,
 		player:Player.getAllInitPack(),
-		bullet:Bullet.getAllInitPack(),
+		wave:Wave.getAllInitPack(),
+		bullet:Bullet.getAllInitPack()
 	})
 }
 Player.getAllInitPack = function(){
@@ -209,16 +213,89 @@ Player.update = function(){
 	}
 	return pack;
 }
-
-
 var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
-	self.angle = param.angle/180*Math.PI;
-	/*
+	self.angle = param.angle;///180*Math.PI;
 	self.spdX = Math.cos(param.angle/180*Math.PI) * 10;
 	self.spdY = Math.sin(param.angle/180*Math.PI) * 10;
-	*/
+	self.parent = param.parent;
+
+	self.timer = 0;
+	self.toRemove = false;
+	var super_update = self.update();
+	self.update = function(){
+		if(self.timer++ > 100)
+			self.toRemove = true;
+			console.log('lol');
+
+			super_update;
+
+			for(var i in Player.list){
+				var p = Player.list[i];
+				if(self.getDistance(p) < 32 && self.parent !== p.id){
+					p.hp -= 1;
+					if(p.hp <= 0){
+						var shooter = Player.list[self.parent];
+						if(shooter)
+							shooter.score += 1;
+						p.hp = p.hpMax;
+						p.x = Math.random() * 500;
+						p.y = Math.random() * 500;
+					}
+					self.toRemove = true;
+				}
+			}
+		}
+		self.getInitPack = function(){
+			return {
+				id:self.id,
+				x:self.x,
+				y:self.y,
+				a:self.angle,
+			};
+		}
+		self.getUpdatePack = function(){
+			return {
+				id:self.id,
+				x:self.x,
+				y:self.y,
+			};
+		}
+
+		Bullet.list[self.id] = self;
+		initPack.bullet.push(self.getInitPack());
+		return self;
+	}
+
+	Bullet.list = {};
+
+	Bullet.update = function(){
+		var pack = [];
+		for(var i in Bullet.list){
+			var bullet = Bullet.list[i];
+			bullet.update();
+			if(bullet.toRemove){
+				delete Bullet.list[i];
+				removePack.bullet.push(bullet.id);
+			} else
+				pack.push(bullet.getUpdatePack());
+		}
+		return pack;
+	}
+
+	Bullet.getAllInitPack = function(){
+		var bullets = [];
+		for(var i in Bullet.list)
+			bullets.push(Bullet.list[i].getInitPack());
+		return bullets;
+	}
+
+
+var Wave = function(param){
+	var self = Entity(param);
+	self.id = Math.random();
+	self.angle = param.angle/180*Math.PI;
 	self.spd = 10;
 	self.dis = 0;
 	self.parent = param.parent;
@@ -262,31 +339,31 @@ var Bullet = function(param){
 		};
 	}
 
-	Bullet.list[self.id] = self;
-	initPack.bullet.push(self.getInitPack());
+	Wave.list[self.id] = self;
+	initPack.wave.push(self.getInitPack());
 	return self;
 }
-Bullet.list = {};
+Wave.list = {};
 
-Bullet.update = function(){
+Wave.update = function(){
 	var pack = [];
-	for(var i in Bullet.list){
-		var bullet = Bullet.list[i];
-		bullet.update();
-		if(bullet.toRemove){
-			delete Bullet.list[i];
-			removePack.bullet.push(bullet.id);
+	for(var i in Wave.list){
+		var wave = Wave.list[i];
+		wave.update();
+		if(wave.toRemove){
+			delete Wave.list[i];
+			removePack.wave.push(wave.id);
 		} else
-			pack.push(bullet.getUpdatePack());
+			pack.push(wave.getUpdatePack());
 	}
 	return pack;
 }
 
-Bullet.getAllInitPack = function(){
-	var bullets = [];
-	for(var i in Bullet.list)
-		bullets.push(Bullet.list[i].getInitPack());
-	return bullets;
+Wave.getAllInitPack = function(){
+	var waves = [];
+	for(var i in Wave.list)
+		waves.push(Wave.list[i].getInitPack());
+	return waves;
 }
 
 var DEBUG = true;
@@ -342,8 +419,8 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
-var initPack = {player:[],bullet:[]};
-var removePack = {player:[],bullet:[]};
+var initPack = {player:[],wave:[],bullet:[]};
+var removePack = {player:[],wave:[],bullet:[]};
 var wavepack = {tiles:[]}
 
 setInterval(function(){
@@ -360,8 +437,10 @@ setInterval(function(){
 		socket.emit('remove',removePack);
 	}
 	initPack.player = [];
+	initPack.wave = [];
 	initPack.bullet = [];
 	removePack.player = [];
+	removePack.wave = [];
 	removePack.bullet = [];
 	wavepack.tiles = [];
 },1000/25);
