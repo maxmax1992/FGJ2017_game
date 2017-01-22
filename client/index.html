@@ -38,7 +38,7 @@
 	var chatForm = document.getElementById('chat-form');
 
 	socket.on('addToChat',function(data){
-		chatText.innerHTML += '<div>' + data + '</div>';
+		chatText.innerHTML = '<div>' + data + '</div>' + chatText.innerHTML;
 	});
 	socket.on('evalAnswer',function(data){
 		// console.log(data);
