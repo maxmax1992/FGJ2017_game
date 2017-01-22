@@ -28,6 +28,7 @@ var World = function(){
 	self.solidTiles = [];
 	self.tileSize = 8;
 	self.gridSize = 100;
+	self.SIZE = self.tileSize*self.gridSize;
 	for (var i = 0; i < self.gridSize; i++) {
 	    self.tiles[i] = [];
 	    self.oldTiles[i] = [];
@@ -38,12 +39,12 @@ var World = function(){
 	        self.tiles[i][j] = 0;
 	        self.oldTiles[i][j] = 0;
     	    self.solidTiles[i][j] = false;
-    	    //if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
-	    	/*if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
-    		//if( i == 50 && j == 46){
-    	   	//    self.solidTiles[i][j] = true; 
-    		//	worldpack.wall.push( [i,j,true] );
-    	    )}*/
+    	    //if( i == 50 && j == 46){
+    	   	
+    	    if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
+	    	    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
 	    }
 	}
 }
