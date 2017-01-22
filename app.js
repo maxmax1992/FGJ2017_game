@@ -288,7 +288,7 @@ var Bullet = function(param){
 	self.timer = 0;
 	self.toRemove = false;
 	var super_update = self.update;
-	var trailStrenght = 80;
+	var trailStrenght = 64;
 
 	self.update = function(){
 		if(self.timer++ > 100)
