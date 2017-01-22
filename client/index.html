@@ -70,7 +70,7 @@
 		"player_green_stepLeft.png",   "tile_house_corner.png",
 		"player_green_stepRight.png",  "tile_house_middle.png",
 		"player_red_leftStep.png",     "tile_house_side.png",
-		"player_red_rightStep.png"
+		"player_red_rightStep.png",	   "floor_wood.png",
 			];
 
 
@@ -117,9 +117,20 @@
 		self.draw = function(){
 			var bx = - Player.list[selfId].x + WIDTH/2;
 			var by = - Player.list[selfId].y + HEIGHT/2;
-			for (var i = 0; i < WIDTH; i+=80) {
-					for (var j = 0; j < HEIGHT; j+=80) {
-						bgr.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 80, 80);
+			for (var i = 0; i < WIDTH/40; i++) {
+					for (var j = 0; j < HEIGHT/40; j++) {
+						var gx = i * 40 + bx-4;
+						var gy = j * 40 + by-4;
+						/*if ((i > 1  && i < 6  && j > 1  && j < 6 ) ||
+							(i > 9  && i < 17 && j > 4  && j < 6 ) ||
+							(i > 14 && i < 17 && j > 6  && j < 10) ||
+							(i > 2  && i < 16 && j > 13 && j < 17)) {*/
+						if (i > 3  && i < 10  && j > 5  && j < 12 ) {
+								bgr.drawImage(Img["tile_house_middle.png"], gx , gy, 80, 80);
+						}
+						else{
+							bgr.drawImage(Img["tile_grass.png"], gx , gy, 80, 80);
+						}
 					}
 				}
 			}
@@ -164,7 +175,7 @@
 					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 		    	}
 			    else if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-			        newval =  0.90*Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
+			        newval =  Math.round( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] +
 			        					  WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
 			        newval -= Math.sign(newval);
 		        }
@@ -175,16 +186,16 @@
 					var r = Math.ceil((c/255)*155)+100;
 					var b = Math.ceil((c/255)*100)
 					if (c > 128){
-						gfx0.fillStyle = 'rgb(' + c + ','  + 0 + ',0)';
+						gfx0.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx0.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else if (c > 64){
-						gfx1.fillStyle = 'rgb(' + 0 + ','  + c + ',0)';
+						gfx1.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx1.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 					else{
 
-						gfx2.fillStyle = 'rgb(' + 0 + ','  + 0 + ',0)';
+						gfx2.fillStyle = 'rgb(' + r + ','  + b + ',0)';
 						gfx2.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 					}
 				}
@@ -273,27 +284,17 @@
 						return Img_player;
 					}
 				}
-
-
 			ctx.save();
 			var angle = 0;
 			if (self.mouseAngle)
 				angle = self.mouseAngle;
 			ctx.translate(x, y);
-			ctx.rotate(0.0174533 * (self.mouseAngle+90));// + 90)/ Math.PI * 180);
-
+			ctx.rotate( 0.0174533 * (self.mouseAngle+90));// + 90)/ Math.PI * 180);
 			var img = currentAction();
-			// ctx.drawImage(,
-			// 	x-width/2,y-height/2, width, height);
-			//  console.log("\n3: " + width + "\n4: " +  height);
 			ctx.drawImage(img, -width/2, -width/2, width, height);
-
-
 			ctx.rotate(-0.0174533 * self.mouseAngle);// + 90)/ Math.PI * 180);
-
 			ctx.translate(-x, -y);
 			ctx.restore();
-			//ctx.fillText(self.score,self.x,self.y-60);
 		}
 
 		Player.list[self.id] = self;
@@ -313,18 +314,19 @@
 		var Img_bullet = Img["wave_normal.png"];
 
 		self.draw = function(){
+			var x = self.x - Player.list[selfId].x + WIDTH/2;
+			var y = self.y - Player.list[selfId].y + HEIGHT/2;
+			
 			var width = 40;
 			var height = 10;
 
-			var x = self.x - Player.list[selfId].x + WIDTH/2;
-			var y = self.y - Player.list[selfId].y + HEIGHT/2;
-			/*ctx.beginPath();
-			ctx.arc(x, y, self.dis, self.angle- Math.PI/4, self.angle+Math.PI/4);
-			ctx.stroke();
-			*/
-			ctx.drawImage(Img_bullet,
-				0,0,Img_bullet.width,height,
-				x-width/2,y-height/2,width,height)
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.rotate( self.angle + Math.PI/2 );
+			ctx.drawImage(Img_bullet, -width/2, -width/2, width, height);
+			ctx.rotate( self.angle + Math.PI/2);
+			ctx.translate(-x, -y);
+			ctx.restore();
 		}
 
 		Bullet.list[self.id] = self;
@@ -466,7 +468,7 @@
 	}
 	document.onmousemove = function(event){
 		var x = -400 + event.clientX - 8;
-		var y = -300 + event.clientY - 8;
+		var y = -400 + event.clientY - 8;
 		var angle = Math.atan2(y,x) / Math.PI * 180;
 		socket.emit('keyPress',{inputId:'mouseAngle',state:angle});
 	}
