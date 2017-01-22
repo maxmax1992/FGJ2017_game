@@ -39,12 +39,11 @@ var World = function(){
 	        self.oldTiles[i][j] = 0;
     	    self.solidTiles[i][j] = false;
     	    //if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
-	    	if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
+	    	/*if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
     		//if( i == 50 && j == 46){
-    	    	console.log(i,j);
-    	   	    self.solidTiles[i][j] = true; 
-    			worldpack.wall.push( [i,j,true] );
-    	    }
+    	   	//    self.solidTiles[i][j] = true; 
+    		//	worldpack.wall.push( [i,j,true] );
+    	    )}*/
 	    }
 	}
 }
@@ -132,13 +131,13 @@ var Player = function(param){
 		}
 		*/
 		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
-		/*Bullet({
+		
+		Bullet({
 			parent:self.id,
 			angle:angle,
 			x:self.x,
 			y:self.y,
 		});
-		*/
 	}
 
 	//if (self.mouseAngle)
@@ -255,12 +254,9 @@ var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
 	self.angle = param.angle/180*Math.PI;
-	/*
 	self.spdX = Math.cos(param.angle/180*Math.PI) * 10;
 	self.spdY = Math.sin(param.angle/180*Math.PI) * 10;
-	*/
 	self.spd = 10;
-	self.dis = 0;
 	self.parent = param.parent;
 
 	self.timer = 0;
@@ -269,8 +265,7 @@ var Bullet = function(param){
 	self.update = function(){
 		if(self.timer++ > 100)
 			self.toRemove = true;
-		//super_update();
-		self.dis += self.spd;
+		super_update();
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent !== p.id){
@@ -298,7 +293,9 @@ var Bullet = function(param){
 	self.getUpdatePack = function(){
 		return {
 			id:self.id,
-			dis:self.dis,
+			x:self.x,
+			y:self.y,
+			a:self.angle,
 		};
 	}
 
@@ -389,7 +386,6 @@ setInterval(function(){
 		bullet:Bullet.update(),
 		world:worldpack,
 	}
-
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
 		socket.emit('init',initPack);

@@ -104,11 +104,9 @@
 		self.draw = function(){
 			var bx = - Player.list[selfId].x + WIDTH/2;
 			var by = - Player.list[selfId].y + HEIGHT/2;
-			for (var i = 0; i < WIDTH; i++) {
-					for (var j = 0; j < HEIGHT; j++) {
-						if (i%50 == 0 && j%50 == 0) {
-							ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
-						}
+			for (var i = 0; i < WIDTH; i+=50) {
+					for (var j = 0; j < HEIGHT; j+=50) {
+						ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
 					}
 				}
 			}
@@ -268,22 +266,22 @@
 		self.id = initPack.id;
 		self.sx = initPack.x;
 		self.sy = initPack.y;
-		self.dis = 0;
 		self.angle = initPack.a;
-		self.draw = function(){
-			var width = Img.bullet.width/2;
-			var height = Img.bullet.height/2;
+		var Img_bullet = Img["bullet.png"];
 
-			var x = self.sx - Player.list[selfId].x + WIDTH/2;
-			var y = self.sy - Player.list[selfId].y + HEIGHT/2;
-			ctx.beginPath();
+		self.draw = function(){
+			var width = Img_bullet.width/2;
+			var height = Img_bullet.height/2;
+
+			var x = self.x - Player.list[selfId].x + WIDTH/2;
+			var y = self.y - Player.list[selfId].y + HEIGHT/2;
+			/*ctx.beginPath();
 			ctx.arc(x, y, self.dis, self.angle- Math.PI/4, self.angle+Math.PI/4);
 			ctx.stroke();
-			/*
-			ctx.drawImage(Img.bullet,
-				0,0,Img.bullet.width,Img.bullet.height,
-				x-width/2,y-height/2,width,height);
 			*/
+			ctx.drawImage(Img_bullet,
+				0,0,Img_bullet.width,Img_bullet.height,
+				x-width/2,y-height/2,width,height);
 		}
 
 		Bullet.list[self.id] = self;
@@ -326,17 +324,14 @@
 			}
 		}
 		for(var i = 0 ; i < data.bullet.length; i++){
+			
 			var pack = data.bullet[i];
-			var b = Bullet.list[data.bullet[i].id];
+			var b = Bullet.list[pack.id];
 			if(b){
-				if(pack.dis !== undefined)
-					b.dis = pack.dis;
-				/*
 				if(pack.x !== undefined)
 					b.x = pack.x;
 				if(pack.y !== undefined)
 					b.y = pack.y;
-				*/
 			}
 		}
 		for(var i = 0 ; i < data.world.flame.length; i++){
