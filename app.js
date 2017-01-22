@@ -36,38 +36,31 @@ var World = function(){
 WORLD = new World();
 
 World.update = function(){
-	pack = [];
 	var newtiles =  []
-	//console.log(WORLD.tiles);
-
 	for (var i = 0; i < WORLD.gridSize; i++) {
 	    newtiles[i] = [];
 	    for (var j = 0; j < WORLD.gridSize; j++) {
 	    	var newval = 0
 		    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
-		        newval = Math.floor(Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
+		        //newval = Math.floor( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] );
+		        //newval = newval = Math.floor( Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
 		        //newval = Math.floor(Math.abs( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
-
+		        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
+		        newval -= Math.sign(newval);
 	        }
-	        if (newval != WORLD.oldTiles[i][j] ){
-	        	pack.push([i,j,newval])
-	        }
-	        newtiles[i][j] = newval; 
+        if (newval != WORLD.oldTiles[i][j] ){
+          pack.push([i,j,newval])
+        }
+			  newtiles[i][j] = newval;
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
-	WORLD.tiles = newtiles;
-	//console.log(pack.length);
-
-	return pack;
-	}
+	WORLD.tiles = newtiles;	
 }
-WORLD = new World();
 
 
 var Player = function(param){
 	var self = Entity(param);
-	self.number = "" + Math.floor(10 * Math.random());
 	self.pressingRight = false;
 	self.pressingLeft = false;
 	self.pressingUp = false;
@@ -98,6 +91,7 @@ var Player = function(param){
 	}
 	self.shootBullet = function(angle){
 		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 255
+		wavepack.tiles.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
 		/*Bullet({
 			parent:self.id,
 			angle:angle,
@@ -145,7 +139,6 @@ var Player = function(param){
 			id:self.id,
 			x:self.x,
 			y:self.y,
-			number:self.number,
 			hp:self.hp,
 			hpMax:self.hpMax,
 			score:self.score,
@@ -242,7 +235,6 @@ var Bullet = function(param){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent !== p.id){
 				p.hp -= 1;
-
 				if(p.hp <= 0){
 					var shooter = Player.list[self.parent];
 					if(shooter)
@@ -348,22 +340,18 @@ io.sockets.on('connection', function(socket){
 		var res = eval(data);
 		socket.emit('evalAnswer',res);
 	});
-
-
-
 });
 
 var initPack = {player:[],bullet:[]};
 var removePack = {player:[],bullet:[]};
+var wavepack = {tiles:[]}
 
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
-		world:World.update(),
+		wave:wavepack,
 	}
-	//console.log(pack);
-
 
 	for(var i in SOCKET_LIST){
 		var socket = SOCKET_LIST[i];
@@ -374,7 +362,8 @@ setInterval(function(){
 	initPack.player = [];
 	initPack.bullet = [];
 	removePack.player = [];
-	removePack.bullet = [];	
+	removePack.bullet = [];
+	wavepack.tiles = [];
 },1000/25);
 
 /*
