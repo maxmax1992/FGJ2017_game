@@ -16,20 +16,35 @@ console.log("Server started.");
 
 var SOCKET_LIST = {};
 
+//package types sent to the frontend
+var initPack = {player:[],bullet:[]};
+var removePack = {player:[],bullet:[]};
+var worldpack = {flame:[],wall:[]};
+
 var World = function(){
 	var self = this;
 	self.tiles = [];
 	self.oldTiles = [];
+	self.solidTiles = [];
 	self.tileSize = 8;
 	self.gridSize = 100;
 	for (var i = 0; i < self.gridSize; i++) {
 	    self.tiles[i] = [];
 	    self.oldTiles[i] = [];
+	    self.solidTiles[i] = [];
 	    for (var j = 0; j < self.gridSize; j++) {
 	        //self.tiles[i][j] = [0.0,0.0];
 	        //self.oldTiles[i][j] = [0.0,0.0];
 	        self.tiles[i][j] = 0;
 	        self.oldTiles[i][j] = 0;
+    	    self.solidTiles[i][j] = false;
+    	    //if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
+	    	if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
+    		//if( i == 50 && j == 46){
+    	    	console.log(i,j);
+    	   	    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
 	    }
 	}
 }
@@ -77,7 +92,14 @@ var Player = function(param){
 	self.update = function(){
 		self.updateSpd();
 
+		var oldx = self.x;
+		var oldy = self.y;
 		super_update();
+		//if (WORLD.solidTiles[self.x/WORLD.][self.y]){
+		//	self.x = oldx;
+		//	self.y = oldy;
+		//}
+
 		//console.log( Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize) )
 		//console.log( WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)])
 		if(self.pressingAttack){
@@ -91,7 +113,16 @@ var Player = function(param){
 	}
 	self.shootBullet = function(angle){
 		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 255
-		wavepack.tiles.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
+		//console.log(Ma,Math.sin(angle));
+		/*
+		var ux = Math.cos(angle/180*Math.PI);
+		var uy = Math.sin(angle/180*Math.PI);
+		for (var dis = 5; dis < 55; dis += 5){
+			worldpack.flame.push([	Math.floor(self.x/WORLD.tileSize + ux*dis),
+									Math.floor(self.y/WORLD.tileSize + uy*dis),dis*4] );
+		}
+		*/
+		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
 		/*Bullet({
 			parent:self.id,
 			angle:angle,
@@ -342,15 +373,12 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
-var initPack = {player:[],bullet:[]};
-var removePack = {player:[],bullet:[]};
-var wavepack = {tiles:[]}
 
 setInterval(function(){
 	var pack = {
 		player:Player.update(),
 		bullet:Bullet.update(),
-		wave:wavepack,
+		world:worldpack,
 	}
 
 	for(var i in SOCKET_LIST){
@@ -363,7 +391,7 @@ setInterval(function(){
 	initPack.bullet = [];
 	removePack.player = [];
 	removePack.bullet = [];
-	wavepack.tiles = [];
+	worldpack.flame = [];
 },1000/25);
 
 /*
