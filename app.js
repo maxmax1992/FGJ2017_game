@@ -46,20 +46,21 @@ World.update = function(){
 		        //newval = newval = Math.floor( Math.abs( 0.99*(WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
 		        //newval = Math.floor(Math.abs( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j]));
 		        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + WORLD.tiles[i-1][j] + WORLD.tiles[i+1][j])/2 - WORLD.oldTiles[i][j] ) );
-		        newval -= Math.sign(newval); 
+		        newval -= Math.sign(newval);
 	        }
-			newtiles[i][j] = newval; 
+        if (newval != WORLD.oldTiles[i][j] ){
+          pack.push([i,j,newval])
+        }
+			  newtiles[i][j] = newval;
 		}
 	}
 	WORLD.oldTiles = WORLD.tiles;
-	WORLD.tiles = newtiles;
-	
+	WORLD.tiles = newtiles;	
 }
 
 
 var Player = function(param){
 	var self = Entity(param);
-	self.number = "" + Math.floor(10 * Math.random());
 	self.pressingRight = false;
 	self.pressingLeft = false;
 	self.pressingUp = false;
@@ -138,7 +139,6 @@ var Player = function(param){
 			id:self.id,
 			x:self.x,
 			y:self.y,
-			number:self.number,
 			hp:self.hp,
 			hpMax:self.hpMax,
 			score:self.score,

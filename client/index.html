@@ -1,10 +1,11 @@
 <div id="gameDiv" style="display:none;">
+
 	<div id="game" style="position:absolute;width:800px;height:600px">
-		<canvas id="ctx" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
-		<canvas id="ctx-ui" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>		
+		<canvas id="canvas" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
+		<canvas id="ctx-ui" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
 	</div>
-	
-	<div id="belowGame" style="margin-top:620px">	
+
+	<div id="belowGame" style="margin-top:620px">
 		<div id="chat-text" style="width:800;height:100px;overflow-y:scroll">
 			<div>Hello!</div>
 		</div>
@@ -35,7 +36,7 @@
 		chatText.innerHTML += '<div>' + data + '</div>';
 	});
 	socket.on('evalAnswer',function(data){
-		console.log(data);
+		// console.log(data);
 	});
 
 
@@ -52,22 +53,68 @@
 
 	//const fs = require('fs');
 
+	var image_names = [
+		"bullet.png",                  "player_red_shooting.png",
+"player.png",                  "player_red_standing.png",
+"player_black_leftStep.png",   "player_yellow_shooting.png",
+"player_black_rightStep.png",  "player_yellow_standing.png",
+"player_black_shooting.png",   "player_yellow_stepLeft.png",
+"player_black_standing.png",   "player_yellow_stepRight.png",
+"player_green_shooting.png",   "tile_brick.png",
+"player_green_standing.png",   "tile_grass.png",
+"player_green_stepLeft.png",   "tile_house_corner.png",
+"player_green_stepRight.png",  "tile_house_middle.png",
+"player_red_leftStep.png",     "tile_house_side.png",
+"player_red_rightStep.png"
+	];
+
+
+	var new_image_names = [
+		"girl_shooting.png",   "girl_step_right.png",  "man_step_left.png",   "wave_normal.png",
+		"girl_standing.png",   "man_shooting.png",     "man_step_right.png",
+		"girl_step_left.png",  "man_standing.png",    "wave_gradient.png",
+
+	];
+
+
 	var Img = {};
-	Img.player = new Image();
-	Img.player.src = '/client/img/player_black_standing.png';
-	Img.bullet = new Image();
-	Img.bullet.src = '/client/img/bullet.png';
-	Img.player_leftStep = new Image();
-	Img.player_leftStep.src = '/client/img/player_black_leftStep.png';
-	Img.player_rightStep = new Image();
-	Img.player_rightStep.src = '/client/img/player_black_rightStep.png';
-	Img.player_shooting = new Image();
-	Img.player_shooting.src = 'client/img/player_black_shooting.png';
+	image_dir = '/client/img/';
+	new_image_dir = '/client/newImg/';
+
+	image_names.forEach( function(name) {
+		Img[name] = new Image();
+		Img[name].src = image_dir + name;
+	});
+
+	new_image_names.forEach( function(name) {
+		Img[name] = new Image();
+		Img[name].src = new_image_dir + name;
+	})
 
 
-	var ctx = document.getElementById("ctx").getContext("2d");
+
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
+
+	var Background = function(){
+		var self = this;
+
+		self.draw = function(){
+			for (var i = 0; i < WIDTH; i++) {
+					for (var j = 0; j < HEIGHT; j++) {
+						if (i%50 == 0 && j%50 == 0) {
+							var bx = - Player.list[selfId].x + WIDTH/2;
+							var by = - Player.list[selfId].y + HEIGHT/2;
+							ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
+						}
+				}
+			}
+		}
+	}
+	BACKGROUND = new Background();
+
 
 	var World = function(){
 		var self = this;
@@ -89,10 +136,10 @@
 		var bx = - Player.list[selfId].x + WIDTH/2;
 		var by = - Player.list[selfId].y + HEIGHT/2; 
 		var newtiles =  []
+
 		for (var i = 0; i < self.gridSize; i++) {
 		    newtiles[i] = [];
-		    for (var j = 0; j < self.gridSize; j++) {
-		    	
+		    for (var j = 0; j < self.gridSize; j++) {		    	
 		    	var newval = 0
 			    if ( j > 0 && j < WORLD.gridSize-1 &&  i > 0 && i < WORLD.gridSize-1){
 			        newval = Math.round(( (WORLD.tiles[i][j-1] + WORLD.tiles[i][j+1] + 
@@ -110,7 +157,25 @@
 				else{
 					ctx.fillStyle = 'rgb('+Math.abs(c)+',0,'  + Math.abs(c) +')';
 				}
-				ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+			}
+
+		for (var i = 0; i < self.gridSize; i++) {
+		    for (var j = 0; j < self.gridSize; j++) {
+					var x = i*self.tileSize + bx;
+					var y = j*self.tileSize + by;
+					//console.log(self.tiles[i][j])
+					//var c = Math.floor(self.tiles[i][j]*self.tiles[i][j]) / 255*255;
+					//var c = Math.floor( (self.tiles[i][j]*( self.tiles[i][j] / 2)) / (255*126) );
+					//var c = (self.tiles[i][j]*self.tiles[i][j]) / (255*255);
+					var c = self.tiles[i][j];
+					if (c > 0){
+						ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
+					}
+					else{
+						ctx.fillStyle = 'rgb(0, 0,'  + (c) +')';
+					}
+					if (Math.abs(c) > 10)
+						ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
 				}
 			}
 		WORLD.oldTiles = WORLD.tiles;
@@ -122,7 +187,6 @@
 	var Player = function(initPack){
 		var self = {};
 		self.id = initPack.id;
-		self.number = initPack.number;
 		self.x = initPack.x;
 		self.y = initPack.y;
 		self.hp = initPack.hp;
@@ -132,10 +196,18 @@
 		self.shooting = initPack.shooting;
 		self.mouseAngle = initPack.mouseAngle;
 		var stepper = 0
+		var gender = "man";
 
+		if(Math.random() > 0.5)
+			var gender = "girl";
 
+		var Img_player = Img[gender + "_standing.png"];
+		var Img_player_leftStep = Img[gender + "_step_left.png"];
+		var Img_player_rightStep = Img[gender + "_step_right.png"];
+		var Img_player_shooting = Img[gender + "_shooting.png"];
+console.log(Img_player);
 
-		self.draw = function(){
+		self.draw = function() {
 			var x = self.x - Player.list[selfId].x + WIDTH/2;
 			var y = self.y - Player.list[selfId].y + HEIGHT/2;
 
@@ -151,20 +223,20 @@
 
 			var currentAction = function (){
 				if(self.shooting)
-					return Img.player_shooting;
+					return Img_player_shooting;
 				else if(self.walking) {
 					stepper++;
 					if (stepper > 10){
 						if (stepper > 20)
 							stepper = 0;
-						return Img.player_leftStep;
+						return Img_player_leftStep;
 					}
 						else {
-							return Img.player_rightStep;
+							return Img_player_rightStep;
 						}
 					}
 					else {
-						return Img.player;
+						return Img_player;
 					}
 				}
 
@@ -173,10 +245,19 @@
 			var angle = 0;
 			if (self.mouseAngle)
 				angle = self.mouseAngle;
-			ctx.rotate(self.mouseAngle);// + 90)/ Math.PI * 180);
-			//console.log(self.mouseAngle);
-			ctx.drawImage(currentAction(),
-				x-width/2,y-height/2, width, height);
+			ctx.translate(x, y);
+			ctx.rotate(0.0174533 * (self.mouseAngle+90));// + 90)/ Math.PI * 180);
+
+			var img = currentAction();
+			// ctx.drawImage(,
+			// 	x-width/2,y-height/2, width, height);
+			//  console.log("\n3: " + width + "\n4: " +  height);
+			ctx.drawImage(img, -width/2, -width/2, width, height);
+
+
+			ctx.rotate(-0.0174533 * self.mouseAngle);// + 90)/ Math.PI * 180);
+
+			ctx.translate(-x, -y);
 			ctx.restore();
 			//ctx.fillText(self.score,self.x,self.y-60);
 		}
@@ -221,7 +302,6 @@
 	socket.on('init',function(data){
 		if(data.selfId)
 			selfId = data.selfId;
-		//{ player : [{id:123,number:'1',x:0,y:0},{id:1,number:'2',x:0,y:0}], bullet: []}
 		for(var i = 0 ; i < data.player.length; i++){
 			new Player(data.player[i]);
 		}
@@ -235,7 +315,6 @@
 		for(var i = 0 ; i < data.player.length; i++){
 			var pack = data.player[i];
 			var p = Player.list[pack.id];
-			//console.log("player data" + data[i]);
 			if(p){
 				if(pack.x !== undefined)
 					p.x = pack.x;
@@ -249,7 +328,7 @@
 					p.shooting = pack.shooting;
 				if(pack.walking !== undefined)
 					p.walking = pack.walking;
-				if(pack.mouseAngle !== pack.mouseAngle)
+				if(pack.mouseAngle !== undefined)
 					p.mouseAngle = pack.mouseAngle;
 			}
 		}
@@ -273,7 +352,6 @@
 
 		/*for(var i = 0 ; i < data.world.length; i++){
 			var pack = data.world[i];
-			//console.log(pack);
 			WORLD.tiles[pack[0]][pack[1]] = pack[2];
 		}*/
 
@@ -294,6 +372,7 @@
 			return;
 		ctx.clearRect(0,0,WIDTH,HEIGHT);
 		//drawScore();
+		BACKGROUND.draw();
 		WORLD.draw();
 		for(var i in Player.list)
 			Player.list[i].draw();
