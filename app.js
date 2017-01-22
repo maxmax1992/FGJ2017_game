@@ -94,6 +94,7 @@ var Player = function(param){
 	self.pressingUp = false;
 	self.pressingDown = false;
 	self.pressingAttack = false;
+	self.altFire = false;
 	self.walking = false;
 	self.shooting = false;
 	self.shootcount = 0;
@@ -117,8 +118,15 @@ var Player = function(param){
 
 		//console.log( Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize) )
 		//console.log( WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)])
+		if(self.altFire){
+			self.shootFlame();
+			self.shooting = true;
+			self.shootcount++;
+			if (self.shootcount > self.shootLimit){
+				self.altFire = false;
+			}
+		}
 		if(self.pressingAttack){
-
 			self.shootBullet(self.mouseAngle);
 			self.shooting = true;
 			self.shootcount++;
@@ -133,8 +141,9 @@ var Player = function(param){
 			}
 		}
 	}
-	self.shootBullet = function(angle){
-		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 2550
+	self.shootFlame = function(){
+		//2550
+		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 310
 		//console.log(Ma,Math.sin(angle));
 		/*
 		var ux = Math.cos(angle/180*Math.PI);
@@ -144,8 +153,9 @@ var Player = function(param){
 									Math.floor(self.y/WORLD.tileSize + uy*dis),dis*4] );
 		}
 		*/
-		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),2550] );
-
+		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),310] );
+	}
+	self.shootBullet = function(angle){	
 		Bullet({
 			parent:self.id,
 			angle:angle,
@@ -233,6 +243,8 @@ Player.onConnect = function(socket){
 			player.pressingUp = data.state;
 		else if(data.inputId === 'down')
 			player.pressingDown = data.state;
+		else if(data.inputId === 'q')
+			player.altFire = data.state;
 		else if(data.inputId === 'attack')
 			player.pressingAttack = data.state;
 		else if(data.inputId === 'mouseAngle')
@@ -279,10 +291,16 @@ var Bullet = function(param){
 	self.timer = 0;
 	self.toRemove = false;
 	var super_update = self.update;
+	var trailStrenght = 64;
+
 	self.update = function(){
 		if(self.timer++ > 40)
 			self.toRemove = true;
 		super_update();
+		//trail
+		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = trailStrenght
+		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),trailStrenght] );
+
 		for(var i in Player.list){
 			var p = Player.list[i];
 			if(self.getDistance(p) < 32 && self.parent !== p.id){
