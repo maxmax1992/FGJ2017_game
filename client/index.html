@@ -1,7 +1,13 @@
 <div id="gameDiv" style="display:none;">
 
 	<div id="game" style="position:absolute;width:800px;height:600px">
+		<canvas id="backgr" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
 		<canvas id="canvas" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
+
+		<canvas id="effect0" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
+		<canvas id="effect1" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
+		<canvas id="effect2" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
+
 		<canvas id="ctx-ui" width="800" height="600" style="position:absolute;border:1px solid #000000;"></canvas>
 	</div>
 
@@ -54,18 +60,18 @@
 
 	var image_names = [
 		"bullet.png",                  "player_red_shooting.png",
-"player.png",                  "player_red_standing.png",
-"player_black_leftStep.png",   "player_yellow_shooting.png",
-"player_black_rightStep.png",  "player_yellow_standing.png",
-"player_black_shooting.png",   "player_yellow_stepLeft.png",
-"player_black_standing.png",   "player_yellow_stepRight.png",
-"player_green_shooting.png",   "tile_brick.png",
-"player_green_standing.png",   "tile_grass.png",
-"player_green_stepLeft.png",   "tile_house_corner.png",
-"player_green_stepRight.png",  "tile_house_middle.png",
-"player_red_leftStep.png",     "tile_house_side.png",
-"player_red_rightStep.png"
-	];
+		"player.png",                  "player_red_standing.png",
+		"player_black_leftStep.png",   "player_yellow_shooting.png",
+		"player_black_rightStep.png",  "player_yellow_standing.png",
+		"player_black_shooting.png",   "player_yellow_stepLeft.png",
+		"player_black_standing.png",   "player_yellow_stepRight.png",
+		"player_green_shooting.png",   "tile_brick.png",
+		"player_green_standing.png",   "tile_grass.png",
+		"player_green_stepLeft.png",   "tile_house_corner.png",
+		"player_green_stepRight.png",  "tile_house_middle.png",
+		"player_red_leftStep.png",     "tile_house_side.png",
+		"player_red_rightStep.png"
+			];
 
 
 	var new_image_names = [
@@ -91,27 +97,34 @@
 	})
 
 
-
+	var bgr = document.getElementById("backgr").getContext("2d");
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
+	
+	var gfx0 = document.getElementById("effect0").getContext("2d");
+	var gfx1 = document.getElementById("effect1").getContext("2d");
+	var gfx2 = document.getElementById("effect2").getContext("2d");
+
 	var ctxUi = document.getElementById("ctx-ui").getContext("2d");
 	ctxUi.font = '30px Arial';
-	ctxUi.globalAlpha = 0.5;
+	gfx0.globalAlpha = 0.85;
+	gfx1.globalAlpha = 0.60;
+	gfx2.globalAlpha = 1;
 
 	var Background = function(){
 		var self = this;
-
 		self.draw = function(){
 			var bx = - Player.list[selfId].x + WIDTH/2;
 			var by = - Player.list[selfId].y + HEIGHT/2;
 			for (var i = 0; i < WIDTH; i+=50) {
 					for (var j = 0; j < HEIGHT; j+=50) {
-						ctx.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
+						bgr.drawImage(Img["tile_grass.png"], i+bx-4, j+by-4, 50, 50);
 					}
 				}
 			}
 		}
 	BACKGROUND = new Background();
+	//BACKGROUND.draw();
 
 
 	var World = function(){
@@ -156,18 +169,45 @@
 		        }
 				newtiles[i][j] = newval; 
 		    	
-				var c = self.tiles[i][j];
+				var c = Math.min(255,self.tiles[i][j]);
 				if (c > 0){
-					ctx.fillStyle = 'rgb(' + c + ','  + c + ',0)';
-					//ctxUi.fillStyle = 'rgb(' + 255 + ','  + 255 + ',0,0.5)';
+					var r = Math.ceil((c/255)*155)+100;
+					var b = Math.ceil((c/255)*100)
+					if (c > 128){
+						gfx0.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+						gfx0.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
+					else if (c > 64){
+						gfx1.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+						gfx1.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
+					else{
+						gfx2.fillStyle = 'rgb(' + r + ','  + b + ',0)';
+						gfx2.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
 				}
 				else{
-					ctx.fillStyle = 'rgb('+Math.abs(c)+',0,'  + Math.abs(c) +')';
-					//ctx.fillStyle = 'rgb(255,255,255,0.5)';
+					var r = Math.ceil((Math.abs(c)/255)*155)+100;
+					var gb = Math.ceil((c/255)*50)
+					if (c > 128){
+						gfx0.fillStyle = 'rgb('+r+','+gb+','+ gb +')';
+						gfx0.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
+					else if (c > 64){
+						gfx1.fillStyle = 'rgb('+r+','+gb+','+ gb +')';
+						gfx1.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
+					else{
+						gfx2.fillStyle = 'rgb('+r+','+gb+','+ gb +')';
+						gfx2.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+					}
+					//gfx.fillStyle = 'rgb('+r+','+gb+','+ gb +')';
+
+
 				}
-				if (Math.abs(c) != 0)
-					ctx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
-				//}
+				/*if (Math.abs(c) != 0)
+					gfx.fillRect(x - 4,y - 4,self.tileSize,self.tileSize);
+				//}*/
 				}
 			}
 		WORLD.oldTiles = WORLD.tiles;
@@ -362,7 +402,14 @@
 	setInterval(function(){
 		if(!selfId)
 			return;
+
+		bgr.clearRect(0,0,WIDTH,HEIGHT);
 		ctx.clearRect(0,0,WIDTH,HEIGHT);
+
+		gfx0.clearRect(0,0,WIDTH,HEIGHT);
+		gfx1.clearRect(0,0,WIDTH,HEIGHT);
+		gfx2.clearRect(0,0,WIDTH,HEIGHT);
+
 		//ctxUi.clearRect(0,0,WIDTH,HEIGHT);
 		//drawScore();
 		BACKGROUND.draw();
