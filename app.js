@@ -28,6 +28,7 @@ var World = function(){
 	self.solidTiles = [];
 	self.tileSize = 8;
 	self.gridSize = 100;
+	self.SIZE = self.tileSize*self.gridSize;
 	for (var i = 0; i < self.gridSize; i++) {
 	    self.tiles[i] = [];
 	    self.oldTiles[i] = [];
@@ -38,12 +39,25 @@ var World = function(){
 	        self.tiles[i][j] = 0;
 	        self.oldTiles[i][j] = 0;
     	    self.solidTiles[i][j] = false;
-    	    //if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
-	    	/*if( i == 50 && j > 30 &&j < 60 && j != 45 && j!=44 && j!=46){
-    		//if( i == 50 && j == 46){
-    	   	//    self.solidTiles[i][j] = true; 
-    		//	worldpack.wall.push( [i,j,true] );
-    	    )}*/
+    	    //if( i == 50 && j == 46){
+    	   	
+    	    if( i == 50 && j >= 30 &&j <= 60 && j!=42 && j!=43 && j!=44 && j!=46 && j!=47 && j!=48){
+	    	    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
+    	    else if( i == 20 && j >= 30 &&j <= 60 ){
+	    	    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
+    	    else if( j == 30 && i > 20 &&i < 50 ){
+			    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
+    	    else if( j == 60 && i > 20 &&i < 50 ){
+			    self.solidTiles[i][j] = true; 
+    			worldpack.wall.push( [i,j,true] );
+    	    }
+
 	    }
 	}
 }
@@ -120,7 +134,7 @@ var Player = function(param){
 		}
 	}
 	self.shootBullet = function(angle){
-		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 255
+		WORLD.tiles[Math.floor(self.x/WORLD.tileSize)][Math.floor(self.y/WORLD.tileSize)] = 2550
 		//console.log(Ma,Math.sin(angle));
 		/*
 		var ux = Math.cos(angle/180*Math.PI);
@@ -130,7 +144,7 @@ var Player = function(param){
 									Math.floor(self.y/WORLD.tileSize + uy*dis),dis*4] );
 		}
 		*/
-		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),255] );
+		worldpack.flame.push( [Math.floor(self.x/WORLD.tileSize),Math.floor(self.y/WORLD.tileSize),2550] );
 		
 		Bullet({
 			parent:self.id,

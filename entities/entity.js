@@ -22,10 +22,24 @@ exports.Entity = function(param){
 	}
 	self.updatePosition = function(){
 	//COLLISION
-	//if (!WORLD.solidTiles[Math.floor((self.x + self.spdX)/WORLD.tileSize)][Math.floor((self.y + self.spdY)/WORLD.tileSize)]){
-		self.x += self.spdX;
-		self.y += self.spdY;
-	//	}
+	var nx = self.x + self.spdX;
+	var ny = self.y + self.spdY;
+	while(nx<0){
+		nx += WORLD.SIZE;
+	}
+	while(nx>WORLD.SIZE){
+		nx -= WORLD.SIZE;
+	}
+	while(ny<0){
+		ny += WORLD.SIZE;
+	}
+	while(ny>WORLD.SIZE){
+		ny -= WORLD.SIZE;
+	}
+	if (!WORLD.solidTiles[Math.floor(nx/WORLD.tileSize)][Math.floor(ny/WORLD.tileSize)]){
+		self.x = nx;
+		self.y = ny;
+		}
 	}
 	self.getDistance = function(pt){
 		return Math.sqrt(Math.pow(self.x-pt.x,2) + Math.pow(self.y-pt.y,2));
