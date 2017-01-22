@@ -217,19 +217,19 @@ var Bullet = function(param){
 	var self = Entity(param);
 	self.id = Math.random();
 	self.angle = param.angle;///180*Math.PI;
+	console.log(self.angle);
 	self.spdX = Math.cos(param.angle/180*Math.PI) * 10;
 	self.spdY = Math.sin(param.angle/180*Math.PI) * 10;
 	self.parent = param.parent;
 
 	self.timer = 0;
 	self.toRemove = false;
-	var super_update = self.update();
+	var super_update = self.update;
 	self.update = function(){
 		if(self.timer++ > 100)
 			self.toRemove = true;
-			console.log('lol');
 
-			super_update;
+			super_update();
 
 			for(var i in Player.list){
 				var p = Player.list[i];
@@ -248,6 +248,8 @@ var Bullet = function(param){
 			}
 		}
 		self.getInitPack = function(){
+
+			//console.log('bullet.getInitPack');
 			return {
 				id:self.id,
 				x:self.x,
@@ -256,6 +258,8 @@ var Bullet = function(param){
 			};
 		}
 		self.getUpdatePack = function(){
+
+			//console.log('bullet.getUpdatePack');
 			return {
 				id:self.id,
 				x:self.x,
@@ -274,13 +278,16 @@ var Bullet = function(param){
 		var pack = [];
 		for(var i in Bullet.list){
 			var bullet = Bullet.list[i];
+			var oldx = bullet.x;
 			bullet.update();
+			//console.log(oldx,bullet.x);
 			if(bullet.toRemove){
 				delete Bullet.list[i];
 				removePack.bullet.push(bullet.id);
 			} else
 				pack.push(bullet.getUpdatePack());
 		}
+		//console.log(pack);
 		return pack;
 	}
 

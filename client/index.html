@@ -339,9 +339,12 @@
 		for(var i = 0 ; i < data.bullet.length; i++){
 			var pack = data.bullet[i];
 			var b = Bullet.list[data.bullet[i].id];
+			console.log(b);
 			if(b){
-				if(pack.x !== undefined)
+				console.log(1);
+				if(pack.x !== undefined){
 					b.x = pack.x;
+				console.log(2);}
 				if(pack.y !== undefined)
 					b.y = pack.y;
 				}
@@ -356,8 +359,8 @@
 				if(pack.x !== undefined)
 					b.x = pack.x;
 				if(pack.y !== undefined)
-					b.y = pack.y;
-				*/
+					b.y = pack.y;*/
+
 			}
 		}
 		for(var i = 0 ; i < data.wave.tiles.length; i++){
