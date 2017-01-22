@@ -83,6 +83,8 @@ var Player = function(param){
 	self.pressingAttack = false;
 	self.walking = false;
 	self.shooting = false;
+	self.shootcount = 0;
+	self.shootLimit = 10;
 	self.maxSpd = 4;
 	self.hp = 10;
 	self.hpMax = 10;
@@ -106,9 +108,16 @@ var Player = function(param){
 
 			self.shootBullet(self.mouseAngle);
 			self.shooting = true;
+			self.shootcount++;
+			if (self.shootcount > self.shootLimit){
+				self.pressingAttack = false;
+			}
 		}
 		else {
 			self.shooting = false;
+			if (self.shootcount > 0){
+				self.shootcount--;
+			}
 		}
 	}
 	self.shootBullet = function(angle){
