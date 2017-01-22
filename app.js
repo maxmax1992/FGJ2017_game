@@ -41,7 +41,7 @@ var World = function(){
     	    self.solidTiles[i][j] = false;
     	    //if( i == 50 && j == 46){
 
-    	    if( i == 50 && j >= 30 &&j <= 60 && j!=42 && j!=43 && j!=44 && j!=46 && j!=47 && j!=48){
+    	    if( i == 50 && j >= 30 &&j <= 60 && j!=42 && j!=43 && j!=44 && j!=45 && j!=46 && j!=47 && j!=48){
 	    	    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
     	    }
