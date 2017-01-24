@@ -40,7 +40,7 @@ var World = function(){
 	        self.oldTiles[i][j] = 0;
     	    self.solidTiles[i][j] = false;
     	    //if( i == 50 && j == 46){
-
+    	    //Todo a proper map and map loading system
     	    if( i == 50 && j >= 30 &&j <= 60 && j!=42 && j!=43 && j!=44 && j!=45 && j!=46 && j!=47 && j!=48){
 	    	    self.solidTiles[i][j] = true;
     			worldpack.wall.push( [i,j,true] );
@@ -401,6 +401,7 @@ io.sockets.on('connection', function(socket){
 			var playerName = ("" + socket.id).slice(2,7);
 		else
 			var playerName = Player.list[socket.id].name;
+		//io.emit( ... ) should work?	
 		for(var i in SOCKET_LIST){
 			SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
 		}
@@ -420,9 +421,22 @@ io.sockets.on('connection', function(socket){
 			else {
 				names.push(name);
 				Player.list[socket.id].name = name;
-				for(var i in SOCKET_LIST)
-					SOCKET_LIST[i].emit('addToChat', name + " joined the chat.");
-
+				for(var i in SOCKET_LIST){
+					if ( i != socket.id)
+						SOCKET_LIST[i].emit('addToChat', name + " joined the chat.");
+					else
+						SOCKET_LIST[i].emit('addToChat', "Set name as " + name + ".");
+				}
+			}
+		}
+		if(data.split(" ")[0] == "msg"){
+			var name = data.split(" ").slice(1).join(' ');
+			if(Player.list[socket.id].name == name)
+				console.log("exists")
+			else
+				var playerName = Player.list[socket.id].name;
+			for(var i in SOCKET_LIST){
+				SOCKET_LIST[i].emit('addToChat',playerName + ': ' + data);
 			}
 		}
 
