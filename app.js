@@ -414,8 +414,10 @@ io.sockets.on('connection', function(socket){
 			socket.emit('evalAnswer',res);
 			return;
 		}
-		if(data.split(" ")[0] == "name"){
-			var name = data.split(" ").slice(1).join(' ');
+		d = data.split(" ");
+		if(d[0] == "name"){
+
+			var name = d[1];//.slice(1).join(' ');
 			if(names.find(function (list_name){return list_name === name}))
 				socket.emit('addToChat', "Username " + name + " is taken, please choose a new username.");
 			else {
@@ -429,8 +431,9 @@ io.sockets.on('connection', function(socket){
 				}
 			}
 		}
-		if(data.split(" ")[0] == "msg"){
-			var name = data.split(" ").slice(1).join(' ');
+		if(d[0] == "msg"){
+			var name = d[1];
+			var msg = d[2];
 			if(Player.list[socket.id].name == name)
 				console.log("exists")
 			else
